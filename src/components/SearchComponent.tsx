@@ -65,7 +65,7 @@ export default function SearchComponent(props: Props) {
   }, [value]);
 
   return (
-    <View style={{ width: '50%' }}>
+    <View>
       <InputComponent
         value={value}
         onChange={val => setValue(val)}

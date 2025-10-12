@@ -70,7 +70,7 @@ const Container = (props: Props) => {
               />
               <SpaceComponent width={10} />
               <TextComponent
-                text="NGUYỄN HOÀNG ĐĂNG (Bin)"
+                text={title}
                 size={sizes.bigText}
                 font={fontFamillies.poppinsBold}
               />
