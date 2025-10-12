@@ -75,7 +75,7 @@ const InputComponent = (props: Props) => {
           <TextInput
             style={[
               globalStyles.text,
-              { margin: 0, padding: 10, paddingVertical: 0 },
+              { margin: 0, padding: 10},
               textStyles,
             ]}
             placeholder={placeholder ?? ''}
