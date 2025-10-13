@@ -11,22 +11,27 @@ interface Props {
   flex?: number;
   numberOfLine?: number;
   color?: string;
+  textAlign?: 'auto'
+  | 'center'
+  | 'justify'
+  | 'right'
+  | 'left';
   type?:
-    | 'extraTitle'
-    | 'bigTitle'
-    | 'title'
-    | 'subTitle'
-    | 'smallTitle'
-    | 'extraText'
-    | 'bigText'
-    | 'text'
-    | 'subText'
-    | 'smallText';
+  | 'extraTitle'
+  | 'bigTitle'
+  | 'title'
+  | 'subTitle'
+  | 'smallTitle'
+  | 'extraText'
+  | 'bigText'
+  | 'text'
+  | 'subText'
+  | 'smallText';
   styles?: StyleProp<TextStyle>;
 }
 
 const TextComponent = (props: Props) => {
-  const { text, size, font, color, flex, styles, numberOfLine, type } = props;
+  const { text, size, font, color, flex, styles, numberOfLine, type, textAlign } = props;
   let fontSize: number = sizes.text;
   let fontFamily: string = fontFamillies.poppinsRegular;
 
@@ -77,6 +82,7 @@ const TextComponent = (props: Props) => {
           fontFamily: font ?? fontFamily,
           fontSize: size ?? fontSize,
           color: color ?? colors.text,
+          textAlign: textAlign ?? 'left'
         },
         styles,
       ]}

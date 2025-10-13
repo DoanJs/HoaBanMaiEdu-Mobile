@@ -7,7 +7,7 @@ import { fontFamillies } from '../constants/fontFamilies';
 import { sizes } from '../constants/sizes';
 
 const CartItemComponent = () => {
-    const [text, setText] = useState('');
+  const [text, setText] = useState('');
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([
@@ -57,6 +57,10 @@ const CartItemComponent = () => {
       />
       <SpaceComponent height={10} />
       <InputComponent
+        textStyles={{
+          textAlignVertical: 'top',
+          minHeight: 120
+        }}
         placeholder="Nội dung"
         value={text}
         onChange={(val) => setText(val)}
