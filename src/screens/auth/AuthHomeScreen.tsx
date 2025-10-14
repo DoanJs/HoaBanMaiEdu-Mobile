@@ -59,13 +59,20 @@ const AuthHomeScreen = ({ navigation }: any) => {
             font={fontFamillies.poppinsSemiBold}
             size={sizes.title}
           />
-          <TextComponent
-            text="Trung tâm can thiệp sớm Hoa Ban Mai Edu - Đà Nẵng"
-            color={colors.text}
-            styles={{
-              width: '80%',
-            }}
-          />
+          <View style={{
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <TextComponent
+              textAlign='center'
+              text="Trung tâm can thiệp sớm Hoa Ban Mai Edu - Đà Nẵng"
+              color={colors.text}
+              font={fontFamillies.poppinsBold}
+              styles={{
+                width: '80%'
+              }}
+            />
+          </View>
 
           <SpaceComponent height={16} />
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "465303174037",
+    "project_id": "hoabanmaiedu-mobile",
+    "storage_bucket": "hoabanmaiedu-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465303174037:android:23fc5f50d576cb3a86149c",
+        "android_client_info": {
+          "package_name": "com.hoabanmaiedu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3dusUvTsKretXGYBt4Rh4GKifo9xHaQg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

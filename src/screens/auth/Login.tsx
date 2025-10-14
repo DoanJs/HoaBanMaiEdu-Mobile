@@ -2,8 +2,7 @@ import { ArrowLeft, Lock } from 'iconsax-react-native';
 import React, { useEffect, useState } from 'react';
 import { ImageBackground, TouchableOpacity, View } from 'react-native';
 import Fontisto from 'react-native-vector-icons/Fontisto';
-// import { auth, signInWithEmailAndPassword } from '../../../firebase.config';
-// import welcomeBackPng from '../../assets/images/welcomeBack.png';
+import { auth, signInWithEmailAndPassword } from '../../../firebase.config';
 import {
   BtnShadowLinearComponent,
   CheckedButtonComponent,
@@ -39,20 +38,20 @@ const Login = ({ navigation }: any) => {
       setErrorText('');
       setIsLoading(true);
 
-      // await signInWithEmailAndPassword(auth, email, password)
-      //   .then(async userCredential => {
-      //     // Signed in
-      //     setIsLoading(false);
-      //     const user = userCredential.user;
-      //     if(remember){
-      //       await AsyncStorage.setItem('user', user.email as string);
-      //     }
-      //   })
-      //   .catch((error: any) => {
-      //     console.log(error);
-      //     setIsLoading(false);
-      //     setErrorText(error.message);
-      //   });
+      await signInWithEmailAndPassword(auth, email, password)
+        .then(async userCredential => {
+          // Signed in
+          setIsLoading(false);
+          const user = userCredential.user;
+          if (remember) {
+            // await AsyncStorage.setItem('user', user.email as string);
+          }
+        })
+        .catch((error: any) => {
+          console.log(error);
+          setIsLoading(false);
+          setErrorText(error.message);
+        });
     }
   };
 
@@ -70,14 +69,12 @@ const Login = ({ navigation }: any) => {
             onPress={() => navigation.goBack()}
           />
           <TextComponent
+            textAlign='center'
             text="Welcome"
             color={colors.background}
             size={sizes.title}
             flex={1}
             font={fontFamillies.poppinsBold}
-            styles={{
-              textAlign: 'center',
-            }}
           />
         </RowComponent>
       </SectionComponent>
@@ -102,7 +99,7 @@ const Login = ({ navigation }: any) => {
           <TextComponent
             text="Sign in to your account"
             color={colors.text}
-            size={sizes.bigText}
+            size={sizes.text}
             font={fontFamillies.poppinsRegular}
           />
 
@@ -118,7 +115,7 @@ const Login = ({ navigation }: any) => {
             allowClear
             prefix={<Fontisto name="email" color={colors.text} size={26} />}
             placeholder="Email Address"
-            placeholderTextColor={colors.text}
+            placeholderTextColor={colors.gray}
             color={colors.background}
             value={email}
             onChange={val => setEmail(val)}
@@ -131,6 +128,8 @@ const Login = ({ navigation }: any) => {
               paddingHorizontal: 26,
               borderRadius: 5,
             }}
+            placeholder='Password'
+            placeholderTextColor={colors.gray}
             prefix={<Lock color={colors.text} size={26} />}
             color={colors.background}
             value={password}
@@ -148,7 +147,7 @@ const Login = ({ navigation }: any) => {
               title="Remember me"
               titleStyles={{
                 fontFamily: fontFamillies.poppinsMedium,
-                fontSize: sizes.bigText,
+                fontSize: sizes.text,
                 color: colors.text,
               }}
               value={remember}
@@ -160,7 +159,7 @@ const Login = ({ navigation }: any) => {
               <TextComponent
                 text="Forgot password"
                 color={colors.blue}
-                size={sizes.bigText}
+                size={sizes.text}
                 font={fontFamillies.poppinsMedium}
               />
             </TouchableOpacity>
@@ -190,7 +189,7 @@ const Login = ({ navigation }: any) => {
           <RowComponent justify="center">
             <TextComponent
               text="Don’t have an account ?"
-              size={sizes.bigText}
+              size={sizes.text}
               font={fontFamillies.poppinsLight}
               color={colors.text}
             />
@@ -199,7 +198,7 @@ const Login = ({ navigation }: any) => {
               <TextComponent
                 text="Sign up"
                 color={colors.text}
-                size={sizes.bigText}
+                size={sizes.text}
                 font={fontFamillies.poppinsMedium}
               />
             </TouchableOpacity>

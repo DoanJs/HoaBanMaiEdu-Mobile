@@ -1,18 +1,31 @@
 import { Logout } from 'iconsax-react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { Image, ScrollView, TouchableOpacity } from 'react-native'
+import { auth, signOut } from '../../../firebase.config'
 import { Container, RowComponent, SearchComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { colors } from '../../constants/colors'
 import { fontFamillies } from '../../constants/fontFamilies'
 import { sizes } from '../../constants/sizes'
 
+
 const ChildrenScreen = ({ navigation }: any) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+
+    await signOut(auth);
+
+    setIsLoading(false);
+  };
+
   return (
     <Container
       bg={colors.primaryLight}
       title="Cô Trần Thị My Ny _ Giám đốc"
       right={
         <Logout
+          onPress={handleLogout}
           size={sizes.title}
           color={colors.orange}
           variant="Bold"
