@@ -34,7 +34,7 @@ const Container = (props: Props) => {
     header: {
       paddingHorizontal: 16,
       paddingVertical: 10,
-      paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 42,
+      paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     title: { paddingHorizontal: 16, flex: 1, alignItems: 'center' },
   });

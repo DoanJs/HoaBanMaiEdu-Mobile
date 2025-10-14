@@ -73,6 +73,6 @@ const CartItemComponent = () => {
 
 export default CartItemComponent;
 const styles = StyleSheet.create({
-  dropdown: { backgroundColor: colors.primaryBold },
+  dropdown: { backgroundColor: colors.orange2 },
   dropdownContainer: { backgroundColor: colors.background },
 });

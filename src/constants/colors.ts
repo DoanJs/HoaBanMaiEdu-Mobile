@@ -10,6 +10,7 @@ export const colors = {
   textBold: "#006633",
   text: "#000000",
   orange:'#FF8C46',
+  orange2:'#FF9933',
 
   red: 'red',
   yellow:'yellow',

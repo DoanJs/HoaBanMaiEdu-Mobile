@@ -68,7 +68,7 @@ const PendingScreen = ({ navigation }: any) => {
         <SpaceComponent height={10} />
 
         <ScrollView showsVerticalScrollIndicator={false}>
-          <RowComponent justify="flex-start" styles={{ flexWrap: 'wrap' }}>
+          <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
             {
               selected === 'Kế hoạch'
                 ? Array.from({ length: 100 }).map((_, index) =>
@@ -77,7 +77,7 @@ const PendingScreen = ({ navigation }: any) => {
                     key={index}
                     style={{
                       padding: 10,
-                      width: '30%',
+                      width: '45%',
                       alignItems: 'center',
                       borderWidth: 1,
                       borderColor: 'coral',
@@ -94,7 +94,7 @@ const PendingScreen = ({ navigation }: any) => {
                     key={index}
                     style={{
                       padding: 10,
-                      width: '30%',
+                      width: '45%',
                       alignItems: 'center',
                       borderWidth: 1,
                       borderColor: 'coral',

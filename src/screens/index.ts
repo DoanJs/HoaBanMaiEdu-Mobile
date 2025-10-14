@@ -1,4 +1,5 @@
 import CartScreen from "./cart/CartScreen";
+import ChildrenScreen from "./children/ChildrenScreen";
 import MediaScreen from "./media/MediaScreen";
 import PendingScreen from "./pending/PendingScreen";
 import PlanDetailScreen from "./plan/PlanDetailScreen";
@@ -19,5 +20,6 @@ export {
     PendingScreen,
     TargetDetailScreen,
     PlanDetailScreen,
-    ReportDetailScreen
+    ReportDetailScreen,
+    ChildrenScreen
 };
