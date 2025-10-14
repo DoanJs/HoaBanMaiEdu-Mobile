@@ -1,3 +1,4 @@
+import AuthNavigator from './AuthNavigator';
 import CartNavigator from './CartNavigator';
 import MainNavigator from './MainNavigator';
 import MediaNavigator from './MediaNavigator';
@@ -12,6 +13,6 @@ export {
   PlanNavigator,
   ReportNavigator,
   TargetNavigator,
-  PendingNavigator
+  PendingNavigator, AuthNavigator
 };
 

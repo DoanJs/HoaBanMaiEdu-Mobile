@@ -5,7 +5,9 @@ export const colors = {
   gray:'#EEEEEE',
 
   primaryLightOpacity: "#F9FEF8",
+  primaryDark: '#AEDC81',
   background: "#ffffff",
+  background1: "#F4F5F9",
   backgroundLight: "#fafffb",
   textBold: "#006633",
   text: "#000000",

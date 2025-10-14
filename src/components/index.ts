@@ -1,5 +1,7 @@
+import BtnShadowLinearComponent from "./BtnShadowLinearComponent";
 import ButtonComponent from "./ButtonComponent";
 import CartItemComponent from "./CartItemComponent";
+import CheckedButtonComponent from "./CheckedButtonComponent";
 import Container from "./Container";
 import Header from "./Header";
 import InputComponent from "./InputComponent";
@@ -14,5 +16,5 @@ import TextComponent from "./TextComponent";
 export {
     TextComponent, SectionComponent, RowComponent, SpaceComponent, Container,
     Header, TargetComponent, InputComponent, SearchComponent, TargetItemComponent,
-    CartItemComponent, ButtonComponent
+    CartItemComponent, ButtonComponent, BtnShadowLinearComponent, CheckedButtonComponent
 }

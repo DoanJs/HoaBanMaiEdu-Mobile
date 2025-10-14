@@ -1,3 +1,6 @@
+import AuthHomeScreen from "./auth/AuthHomeScreen";
+import Login from "./auth/Login";
+import Register from "./auth/Register";
 import CartScreen from "./cart/CartScreen";
 import ChildrenScreen from "./children/ChildrenScreen";
 import MediaScreen from "./media/MediaScreen";
@@ -21,5 +24,7 @@ export {
     TargetDetailScreen,
     PlanDetailScreen,
     ReportDetailScreen,
-    ChildrenScreen
+    ChildrenScreen,
+    Login,Register,
+    AuthHomeScreen
 };
