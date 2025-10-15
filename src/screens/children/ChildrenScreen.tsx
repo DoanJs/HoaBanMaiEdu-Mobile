@@ -13,6 +13,7 @@ import { colors } from '../../constants/colors';
 import { getDocData } from '../../constants/firebase/getDocData';
 import {
   query_fields,
+  query_interventions,
   query_suggests,
   query_targets,
 } from '../../constants/firebase/query';
@@ -22,12 +23,14 @@ import { sizes } from '../../constants/sizes';
 import {
   ChildrenModel,
   FieldModel,
+  InterventionModel,
   SuggestModel,
   TargetModel,
 } from '../../models';
 import {
   useChildrenStore,
   useFieldStore,
+  useInterventionStore,
   useSuggestStore,
   useTargetStore,
   useUserStore,
@@ -140,6 +143,7 @@ const ChildrenScreen = () => {
   const { setFields } = useFieldStore();
   const { setTargets } = useTargetStore();
   const { setSuggests } = useSuggestStore();
+  const { setInterventions } = useInterventionStore();
 
   const { data: data_children, loading: loading_children } =
     useFirestoreWithMetaCondition({
@@ -168,6 +172,12 @@ const ChildrenScreen = () => {
       key: 'suggestsCache',
       query: query_suggests,
       metaDoc: 'suggests',
+    });
+  const { data: data_interventions, loading: loading_interventions } =
+    useFirestoreWithMeta({
+      key: 'interventions',
+      query: query_interventions,
+      metaDoc: 'interventions',
     });
 
   useEffect(() => {
@@ -202,7 +212,12 @@ const ChildrenScreen = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data_suggests, loading_suggests]);
-
+  useEffect(() => {
+    if (!loading_interventions) {
+      setInterventions(data_interventions as InterventionModel[]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data_interventions, loading_interventions]);
   const handleLogout = async () => {
     setIsLoading(true);
 

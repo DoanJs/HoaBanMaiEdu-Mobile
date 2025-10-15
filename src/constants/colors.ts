@@ -3,6 +3,8 @@ export const colors = {
   primaryBold: "#20B2AA99",
   primaryLight: "#E0FFFF",
   gray:'#EEEEEE',
+  gray2:'#DDDDDD',
+  gray3:'#808080',
 
   primaryLightOpacity: "#F9FEF8",
   primaryDark: '#AEDC81',
@@ -16,7 +18,9 @@ export const colors = {
 
   red: 'red',
   yellow:'yellow',
+  yellow2:'#FFFF66',
   green:'#00FF66',
+  green2:'#CCFFCC',
   blue:'blue',
   spinner: 'rgba(0,0,0,0.6)'
 };

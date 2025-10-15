@@ -13,6 +13,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import { colors } from '../constants/colors';
 import { globalStyles } from '../styles/globalStyles';
 import RowComponent from './RowComponent';
+import { SpaceComponent } from '.';
 
 interface Props {
   value: string;
@@ -96,6 +97,7 @@ const InputComponent = (props: Props) => {
             <AntDesign name="close" size={20} color={colors.text} />
           </TouchableOpacity>
         )}
+
         {isPassword && (
           <TouchableOpacity onPress={() => setShowPass(!showPass)}>
             {showPass ? (

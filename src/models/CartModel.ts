@@ -1,5 +1,5 @@
 import { FieldValue } from '@react-native-firebase/firestore';
-import { TimeAtModel } from './TimeAtModel';
+import { TimeAtModel } from '.';
 
 export interface CartModel {
   id: string;

@@ -1,4 +1,4 @@
-import { TimeAtModel } from "./TimeAtModel";
+import { TimeAtModel } from ".";
 
 export interface SuggestModel {
   id: string;

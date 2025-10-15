@@ -1,4 +1,4 @@
-import { TimeAtModel } from "./TimeAtModel";
+import { TimeAtModel } from ".";
 
 export interface FieldModel {
   id: string;
