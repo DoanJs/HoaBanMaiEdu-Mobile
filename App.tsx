@@ -1,5 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { auth, onAuthStateChanged } from './firebase.config';
 import { AuthNavigator, MainNavigator } from './src/router';
@@ -22,11 +22,7 @@ function App() {
     <View style={styles.container}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <NavigationContainer>
-        {isLoading ? (
-          <MainNavigator />
-        ) : (
-          <AuthNavigator />
-        )}
+        {isLoading ? <MainNavigator /> : <AuthNavigator />}
       </NavigationContainer>
     </View>
   );

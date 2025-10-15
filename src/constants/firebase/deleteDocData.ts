@@ -1,25 +1,22 @@
 import {
-  addDoc,
-  collection,
+  deleteDoc,
   doc,
   serverTimestamp,
   updateDoc,
 } from '@react-native-firebase/firestore';
 import { db } from '../../../firebase.config';
 
-export const addDocData = async ({
+export const deleteDocData = async ({
   nameCollect,
-  value,
+  id,
   metaDoc,
 }: {
   nameCollect: string;
-  value: any;
+  id: string;
   metaDoc: string;
 }) => {
-  const result = await addDoc(collection(db, nameCollect), value);
+  await deleteDoc(doc(db, nameCollect, id));
   await updateDoc(doc(db, 'Meta', metaDoc), {
     lastUpdated: serverTimestamp(),
   });
-
-  return result;
 };

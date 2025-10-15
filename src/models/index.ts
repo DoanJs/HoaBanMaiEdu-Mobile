@@ -1,6 +1,17 @@
-import { SelectModel } from "./SelectModel";
-import { TargetModel } from "./TargetModel";
+import { CartModel } from './CartModel';
+import { ChildrenModel } from './ChildrenModel';
+import { FieldModel } from './FieldModel';
+import { SelectModel } from './SelectModel';
+import { SuggestModel } from './SuggestModel';
+import { TargetModel } from './TargetModel';
+import { UserModel } from './UserModel';
 
 export type {
-    TargetModel, SelectModel
+  CartModel,
+  ChildrenModel,
+  FieldModel,
+  SelectModel,
+  SuggestModel,
+  TargetModel,
+  UserModel,
 };

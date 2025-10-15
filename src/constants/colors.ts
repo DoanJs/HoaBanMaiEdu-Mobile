@@ -17,5 +17,6 @@ export const colors = {
   red: 'red',
   yellow:'yellow',
   green:'#00FF66',
-  blue:'blue'
+  blue:'blue',
+  spinner: 'rgba(0,0,0,0.6)'
 };

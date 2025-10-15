@@ -25,11 +25,13 @@ type Props = {
   center?: ReactNode;
   isScroll?: boolean;
   bg?: string;
+  uri?: string;
 };
 
 const Container = (props: Props) => {
   const navigation: any = useNavigation();
-  const { children, title, back, left, right, center, isScroll, bg } = props;
+  const { children, title, back, left, right, center, isScroll, bg, uri } =
+    props;
   const localStyle = StyleSheet.create({
     header: {
       paddingHorizontal: 16,
@@ -65,7 +67,9 @@ const Container = (props: Props) => {
                   resizeMode: 'cover',
                 }}
                 source={{
-                  uri: 'https://cdn.pixabay.com/photo/2019/10/30/16/19/fox-4589927_1280.jpg',
+                  uri:
+                    uri ??
+                    'https://cdn.pixabay.com/photo/2019/10/30/16/19/fox-4589927_1280.jpg',
                 }}
               />
               <SpaceComponent width={10} />

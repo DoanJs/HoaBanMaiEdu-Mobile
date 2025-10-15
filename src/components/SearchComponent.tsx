@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { InputComponent } from '.';
-import { TargetModel } from '../models';
+import { ChildrenModel, TargetModel } from '../models';
 
 interface Props {
   placeholder: string;
   type?: string;
   width?: number | string;
-  arrSource: TargetModel[];
-  // | ChildrenModel[]
+  arrSource: TargetModel[] | ChildrenModel[];
   // |
   // | PlanModel[]
   // | ReportModel[]
@@ -29,6 +28,11 @@ export default function SearchComponent(props: Props) {
           target =>
             target.name.toLowerCase().includes(value.toLowerCase()) ||
             target.level === Number(value),
+        );
+        break;
+      case 'searchChild':
+        items = (arrSource as ChildrenModel[]).filter(target =>
+          target.fullName.toLowerCase().includes(value.toLowerCase()),
         );
         break;
       //   case "searchPlan":
