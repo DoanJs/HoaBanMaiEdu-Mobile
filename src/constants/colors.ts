@@ -22,5 +22,8 @@ export const colors = {
   green:'#00FF66',
   green2:'#CCFFCC',
   blue:'blue',
-  spinner: 'rgba(0,0,0,0.6)'
+  blue2:'#007AFF',
+  blueLight: '#33FFFF',
+  spinner: 'rgba(0,0,0,0.6)',
+
 };

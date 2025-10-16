@@ -19,9 +19,11 @@ import { TextComponent } from '../components';
 import { colors } from '../constants/colors';
 import { fontFamillies } from '../constants/fontFamilies';
 import { sizes } from '../constants/sizes';
+import { useCartStore } from '../zustand/store';
 
 const TabNavigator = () => {
   const Tab = createBottomTabNavigator();
+  const { carts } = useCartStore()
 
   const tabBarIcon = ({ focused, size, color, route }: any) => {
     color = focused ? colors.textBold : colors.text;
@@ -42,7 +44,29 @@ const TabNavigator = () => {
         );
         break;
       case 'Cart':
-        icon = <CartSvg width={size} height={size} color={color} />;
+        icon = <View
+          style={{
+            position: 'relative'
+          }}>
+          {
+            carts.length > 0 &&
+            <TextComponent
+              text={`${carts.length}`}
+              size={size.smallText}
+              font={fontFamillies.poppinsBold}
+              color={colors.red}
+              styles={{
+                position: 'absolute',
+                height: 26,
+                width: 26,
+                top: -10,
+                right: -24,
+                borderRadius: 100,
+              }}
+            />
+          }
+          <CartSvg width={size} height={size} color={color} />
+        </View>;
         title = (
           <TextComponent
             text="Giỏ mục tiêu"

@@ -218,6 +218,8 @@ const ChildrenScreen = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data_interventions, loading_interventions]);
+
+
   const handleLogout = async () => {
     setIsLoading(true);
 

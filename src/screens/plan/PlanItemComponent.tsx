@@ -1,9 +1,20 @@
 import React from 'react'
 import { View } from 'react-native'
 import { RowComponent, TextComponent } from '../../components'
+import { convertTargetField } from '../../constants/convertTargetAndField'
 import { fontFamillies } from '../../constants/fontFamilies'
+import { PlanTaskModel } from '../../models'
+import { useFieldStore, useTargetStore } from '../../zustand/store'
 
-const PlanItemComponent = () => {
+interface Props {
+  index: number
+  planTask: PlanTaskModel
+}
+const PlanItemComponent = (props: Props) => {
+  const { index, planTask } = props
+  const { targets } = useTargetStore()
+  const { fields } = useFieldStore()
+
   return (
     <View style={{
       padding: 10,
@@ -13,12 +24,12 @@ const PlanItemComponent = () => {
       marginBottom: 10,
     }}>
       <RowComponent justify='space-between'>
-        <TextComponent text='1. Ngôn ngữ diễn đạt' font={fontFamillies.poppinsBold} />
+        <TextComponent text={`${index + 1}. ${convertTargetField(planTask.targetId, targets, fields).nameField}`} font={fontFamillies.poppinsBold} />
         <TextComponent text='Level 2' font={fontFamillies.poppinsBold} />
       </RowComponent>
-      <TextComponent text='Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere, accusamus quam. Iusto incidunt doloremque veniam quos magni natus minus laborum quibusdam provident quisquam hic non vitae, sequi nobis quam vel.' />
-      <TextComponent text='- Hỗ trực trực tiếp bằng hình ảnh' />
-      <TextComponent text='- Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere, accusamus quam. Iusto incidunt doloremque veniam quos magni natus minus laborum quibusdam provident quisquam hic non vitae, sequi nobis quam vel.' />
+      <TextComponent text={convertTargetField(planTask.targetId, targets, fields).nameTarget} />
+      <TextComponent text={`- ${planTask.intervention !== '' ? planTask.intervention : 'Trống'}`} styles={{ fontStyle: planTask.intervention !== '' ? 'normal' : 'italic' }} />
+      <TextComponent text={`- ${planTask.content !== '' ? planTask.content : 'Trống'}`} styles={{ fontStyle: planTask.intervention !== '' ? 'normal' : 'italic' }} />
     </View>
   )
 }

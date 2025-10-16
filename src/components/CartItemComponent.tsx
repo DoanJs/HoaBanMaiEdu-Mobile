@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { RowComponent, SpaceComponent, TextComponent } from '.';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { InputComponent, RowComponent, SpaceComponent, TextComponent } from '.';
 import { colors } from '../constants/colors';
 import { convertTargetField } from '../constants/convertTargetAndField';
 import { fontFamillies } from '../constants/fontFamilies';
 import { sizes } from '../constants/sizes';
 import {
+  useCartStore,
   useFieldStore,
-  useInterventionStore,
-  useSuggestStore,
-  useTargetStore,
+  useTargetStore
 } from '../zustand/store';
+import { InterventionModal, SuggestModal } from './modals';
 
 interface Props {
   index: number;
@@ -22,48 +21,36 @@ const CartItemComponent = (props: Props) => {
   const { index, cart } = props;
   const { targets } = useTargetStore();
   const { fields } = useFieldStore();
-  const { interventions } = useInterventionStore();
-  const { suggests } = useSuggestStore();
-  const [title, setTitle] = useState('');
+  const { editCart } = useCartStore()
+  const [content, setContent] = useState('');
+  const [intervention, setIntervention] = useState('');
 
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [openSuggest, setOpenSuggest] = useState(false);
-  const [valueSuggest, setValueSuggest] = useState(null);
-  const [interventionNews, setInterventionNews] = useState<any[]>([]);
-  const [suggestNews, setSuggestNews] = useState<any[]>([]);
+  const [isVisibleSuggest, setIsVisibleSuggest] = useState(false);
+  const [isVisibleIntervention, setIsVisibleIntervention] = useState(false);
 
   useEffect(() => {
-    if (interventions.length > 0) {
-      setInterventionNews(
-        interventions.map(_ => {
-          return {
-            label: _.name,
-            value: _.id,
-          };
-        }),
-      );
+    if (cart && cart.content) {
+      setContent(cart.content);
+      setIntervention(cart.intervention)
+      // const index = suggests.findIndex((suggest) => suggest.name === cart.content)
+      // if (index !== -1) {
+      //   setSuggest(suggests[index])
+      // } else {
+      //   setType('Ý khác')
+      // }
     }
-  }, [interventions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart]);
   useEffect(() => {
-    if (suggests.length > 0) {
-      setSuggestNews(
-        handleSuggestsWithField(cart.fieldId).map(_ => {
-          return {
-            label: _.name,
-            value: _.id,
-          };
-        }),
-      );
+    if (content) {
+      editCart(cart.id, { ...cart, content })
     }
-  }, [suggests]);
-
-  console.log(suggestNews)
-
-  const handleSuggestsWithField = (fieldId: string) => {
-    const items = suggests.filter(suggest => suggest.fieldId === fieldId);
-    return items;
-  };
+  }, [content])
+  useEffect(() => {
+    if (intervention) {
+      editCart(cart.id, { ...cart, intervention })
+    }
+  }, [intervention])
 
   return (
     <View
@@ -77,9 +64,8 @@ const CartItemComponent = (props: Props) => {
     >
       <RowComponent justify="space-between">
         <TextComponent
-          text={`${index + 1}. ${
-            convertTargetField(cart.targetId, targets, fields).nameField
-          }`}
+          text={`${index + 1}. ${convertTargetField(cart.targetId, targets, fields).nameField
+            }`}
           size={sizes.subText}
           font={fontFamillies.poppinsBold}
         />
@@ -95,50 +81,67 @@ const CartItemComponent = (props: Props) => {
         size={sizes.subText}
       />
 
-      <DropDownPicker
-        open={open}
-        value={value}
-        items={interventionNews}
-        setOpen={setOpen}
-        setValue={setValue}
-        setItems={setInterventionNews}
-        placeholder="Mức độ hỗ trợ"
-        style={styles.dropdown}
-        dropDownContainerStyle={styles.dropdownContainer}
-      />
-      <SpaceComponent height={10} />
-      <DropDownPicker
-        open={open}
-        value={value}
-        items={interventionNews}
-        setOpen={setOpen}
-        setValue={setValue}
-        setItems={setInterventionNews}
-        placeholder="Mức độ hỗ trợ"
-        style={styles.dropdown}
-        dropDownContainerStyle={styles.dropdownContainer}
-      />
+      <RowComponent justify='space-between'>
+        <TouchableOpacity
+          style={{ flex: 2 }}
+          onPress={() => setIsVisibleIntervention(true)}>
+          <TextComponent text={intervention ? intervention : 'Chọn mức độ hỗ trợ'}
+            size={sizes.smallText}
+            styles={{
+              backgroundColor: colors.blueLight,
+              padding: 10,
+              borderRadius: 10,
+              textAlign: 'center',
+              fontFamily: fontFamillies.poppinsBold,
+            }} />
+        </TouchableOpacity>
+        <SpaceComponent width={16} />
+        <TouchableOpacity onPress={() => setIsVisibleSuggest(true)}>
+          <TextComponent text='Gợi ý nội dung'
+            size={sizes.smallText}
+            styles={{
+              backgroundColor: colors.green,
+              padding: 10,
+              borderRadius: 10,
+              textAlign: 'center',
+              fontFamily: fontFamillies.poppinsBold,
+            }} />
+        </TouchableOpacity>
+      </RowComponent>
 
       <SpaceComponent height={10} />
 
-      {/*       
       <InputComponent
         textStyles={{
           textAlignVertical: 'top',
           minHeight: 120,
         }}
-        placeholder="Nội dung"
-        value={title}
-        onChange={val => setTitle(val)}
+        placeholder="Nội dung khác"
+        value={content}
+        onChange={val => setContent(val)}
         multible
         numberOfLine={4}
-      /> */}
+      />
+
+      <SuggestModal
+        content={content}
+        visible={isVisibleSuggest}
+        onClose={() => setIsVisibleSuggest(false)}
+        onChange={(val) => setContent(val)}
+        cart={cart}
+      />
+      <InterventionModal
+        intervention={intervention}
+        visible={isVisibleIntervention}
+        onClose={() => setIsVisibleIntervention(false)}
+        onChange={(val) => setIntervention(val)}
+      />
     </View>
   );
 };
 
 export default CartItemComponent;
 const styles = StyleSheet.create({
-  dropdown: { backgroundColor: colors.green2 },
+  dropdown: { backgroundColor: colors.blueLight },
   dropdownContainer: { backgroundColor: colors.background },
 });

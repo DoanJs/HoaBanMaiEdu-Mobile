@@ -5,8 +5,8 @@ interface CartState {
   loading: boolean;
   error: string | null;
   setCarts: (carts: any[]) => void;
-  addCart: (target: any) => void;
-  editCart: (id: string, target: any) => void;
+  addCart: (cart: any) => void;
+  editCart: (id: string, cart: any) => void;
   removeCart: (id: string) => void;
   clearCarts: () => void;
 }
@@ -17,12 +17,12 @@ const useCartStore = create<CartState>(set => ({
   error: null,
 
   setCarts: (carts: any[]) => set({ carts }),
-  addCart: (target: any) =>
-    set((state: any) => ({ carts: [...state.carts, target] })),
-  editCart: (id: string, target: any) =>
+  addCart: (cart: any) =>
+    set((state: any) => ({ carts: [...state.carts, cart] })),
+  editCart: (id: string, cart: any) =>
     set((state: any) => {
       const index = state.carts.findIndex((item: any) => item.id === id);
-      state.carts[index] = target;
+      state.carts[index] = cart;
       return { carts: [...state.carts] };
     }),
   removeCart: (id: string) =>

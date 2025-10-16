@@ -1,22 +1,38 @@
 import { Profile2User } from 'iconsax-react-native'
-import React, { useState } from 'react'
-import { ScrollView, TouchableOpacity } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native'
 import { Container, RowComponent, SearchComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { colors } from '../../constants/colors'
 import { fontFamillies } from '../../constants/fontFamilies'
 import { sizes } from '../../constants/sizes'
+import { useChildStore, usePlanStore } from '../../zustand/store'
+import { PlanModel } from '../../models'
 
 const PendingScreen = ({ navigation }: any) => {
   const [selected, setSelected] = useState('Kế hoạch');
+  const { child } = useChildStore()
+  const { plans } = usePlanStore()
+  const [planNews, setPlanNews] = useState<PlanModel[]>([]);
+
+
+  useEffect(() => {
+    if (plans.length > 0) {
+      setPlanNews(plans)
+    }
+  }, [plans])
+
+  if (!child) return <ActivityIndicator />
   return (
     <Container
       bg={colors.primaryLight}
-      title="NGUYỄN HOÀNG ĐĂNG (Bin)"
+      title={child.fullName}
+      uri={child.avatar}
       right={
         <Profile2User
           size={sizes.title}
           color={colors.textBold}
           variant="Bold"
+          onPress={() => navigation.navigate('ChildrenScreen')}
         />
       }
     >
@@ -59,21 +75,23 @@ const PendingScreen = ({ navigation }: any) => {
         </RowComponent>
 
         <SpaceComponent height={10} />
+
         <SearchComponent
-          arrSource={[]}
-          onChange={() => { }}
+          arrSource={selected === 'Kế hoạch' ? plans : []}
+          onChange={selected === 'Kế hoạch' ? (val) => setPlanNews(val) : () => { }}
           placeholder={`Nhập ${selected === 'Kế hoạch' ? 'kế hoạch' : 'báo cáo'}`}
-          type="searchTarget"
+          type="searchPlan"
         />
+
         <SpaceComponent height={10} />
 
         <ScrollView showsVerticalScrollIndicator={false}>
           <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
             {
               selected === 'Kế hoạch'
-                ? Array.from({ length: 100 }).map((_, index) =>
+                ? planNews.map((_, index) =>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate('PlanDetailScreen')}
+                    onPress={() => navigation.navigate('PlanDetailScreen', {plan: _})}
                     key={index}
                     style={{
                       padding: 10,
@@ -85,7 +103,7 @@ const PendingScreen = ({ navigation }: any) => {
                       marginBottom: 10,
                       marginLeft: 10
                     }}>
-                    <TextComponent text='KH 10/2025' font={fontFamillies.poppinsBold} />
+                    <TextComponent text={_.title} font={fontFamillies.poppinsBold} />
                   </TouchableOpacity>
                 )
                 : Array.from({ length: 100 }).map((_, index) =>

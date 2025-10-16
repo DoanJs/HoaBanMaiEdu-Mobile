@@ -6,11 +6,12 @@ import { Container, RowComponent, SectionComponent } from '../../components';
 import { colors } from '../../constants/colors';
 import { useFirestoreWithMetaCondition } from '../../constants/firebase/useFirestoreWithMetaCondition.ts';
 import { sizes } from '../../constants/sizes';
-import { CartModel } from '../../models/index.ts';
+import { CartModel, PlanModel } from '../../models/index.ts';
 import {
   useCartStore,
   useChildStore,
   useFieldStore,
+  usePlanStore,
   useUserStore,
 } from '../../zustand/store';
 import FieldItemComponent from './FieldItemComponent.tsx';
@@ -20,6 +21,7 @@ const TargetScreen = ({ navigation }: any) => {
   const { fields } = useFieldStore();
   const { user } = useUserStore();
   const { setCarts } = useCartStore();
+  const { setPlans } = usePlanStore();
 
   const { data: data_carts, loading: loading_carts } =
     useFirestoreWithMetaCondition({
@@ -31,6 +33,15 @@ const TargetScreen = ({ navigation }: any) => {
         where('teacherIds', 'array-contains', user?.id),
       ] as QueryConstraint[],
     });
+  const { data: data_plans, loading: loading_plans } =
+    useFirestoreWithMetaCondition({
+      key: "plansCache",
+      metaDoc: "plans",
+      id: user?.id,
+      nameCollect: "plans",
+      condition: [where("teacherIds", "array-contains", user?.id)] as QueryConstraint[],
+    });
+
 
   useEffect(() => {
     if (!loading_carts) {
@@ -39,6 +50,13 @@ const TargetScreen = ({ navigation }: any) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data_carts, loading_carts]);
+  useEffect(() => {
+    if (!loading_plans) {
+      const items = data_plans as PlanModel[];
+      setPlans(items.filter((plan) => plan.childId === child?.id));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data_plans, loading_plans]);
 
   if (!child) return <ActivityIndicator />;
   return (

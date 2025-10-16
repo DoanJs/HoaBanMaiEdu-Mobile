@@ -1,23 +1,76 @@
-import { Profile2User } from 'iconsax-react-native'
-import React from 'react'
-import { FlatList } from 'react-native'
+import { where } from '@react-native-firebase/firestore'
+import { DocumentDownload, Edit2, Profile2User, Trash } from 'iconsax-react-native'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, FlatList } from 'react-native'
 import { ButtonComponent, Container, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { colors } from '../../constants/colors'
+import { convertTargetField } from '../../constants/convertTargetAndField'
+import { getDocsData } from '../../constants/firebase/getDocsData'
 import { fontFamillies } from '../../constants/fontFamilies'
 import { sizes } from '../../constants/sizes'
+import { PlanTaskModel } from '../../models'
+import { useCartEditStore, useCartStore, useChildStore, useFieldStore, useTargetStore, useUserStore } from '../../zustand/store'
 import PlanItemComponent from './PlanItemComponent'
 
-const PlanDetailScreen = () => {
+const PlanDetailScreen = ({ navigation, route }: any) => {
+  const { plan } = route.params
+  const { user } = useUserStore()
+  const { child } = useChildStore()
+  const { fields } = useFieldStore();
+  const { targets } = useTargetStore();
+  const { setCarts } = useCartStore();
+  const { setCartEdit } = useCartEditStore();
+  const [planTasks, setPlanTasks] = useState<PlanTaskModel[]>([]);
+
+  // Lấy trực tiếp từ firebase
+  useEffect(() => {
+    if (plan) {
+      // if (comment) {
+      //   setIsComment(true);
+      //   setText(comment.split("@Js@")[1]);
+      // }
+      getDocsData({
+        nameCollect: "planTasks",
+        condition: [
+          where("teacherIds", "array-contains", user?.id),
+          where("planId", "==", plan.id),
+        ],
+        setData: setPlanTasks,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan]);
+
+
+  const handleEditPlan = () => {
+    const convertPlanTasksToCarts = planTasks.map((_) => {
+      const { targetId, planId, ...newPlanTask } = _;
+      return {
+        ...newPlanTask,
+        targetId: _.targetId,
+        fieldId: convertTargetField(_.targetId, targets, fields).fieldId,
+        name: convertTargetField(_.targetId, targets, fields).nameTarget,
+      };
+    });
+    setCarts(convertPlanTasksToCarts);
+    setCartEdit(plan.id);
+
+    navigation.navigate('Main', { screen: 'Cart' })
+  };
+
+  if (!child) return <ActivityIndicator />
   return (
     <Container
       back
       bg={colors.primaryLight}
-      title="NGUYỄN HOÀNG ĐĂNG (Bin)"
+      title={child.fullName}
+      uri={child.avatar}
       right={
         <Profile2User
           size={sizes.title}
           color={colors.textBold}
           variant="Bold"
+          onPress={() => navigation.navigate('ChildrenScreen')}
         />
       }
     >
@@ -28,25 +81,38 @@ const PlanDetailScreen = () => {
           paddingVertical: 10,
         }}
       >
-        <TextComponent text='KH 10/2025' font={fontFamillies.poppinsBold} />
+        <RowComponent justify='space-between'>
+          <TextComponent text={plan.title} font={fontFamillies.poppinsBold} />
+          <TextComponent text={plan.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
+            size={sizes.smallText}
+            styles={{ fontStyle: 'italic' }} />
+        </RowComponent>
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={Array.from({ length: 10 })}
-          renderItem={({ item, index }) => <PlanItemComponent key={index} />}
+          data={planTasks}
+          renderItem={({ item, index }) => <PlanItemComponent
+            key={item.id}
+            planTask={item}
+            index={index}
+          />}
           ListFooterComponent={
-            <RowComponent justify="space-around">
-              <ButtonComponent
-                color='coral'
-                text="Sửa"
+            <RowComponent justify="space-around" styles={{paddingVertical: 16}}>
+              <DocumentDownload
+                variant='Bold'
+                size={sizes.title}
+                color={colors.blue}
                 onPress={() => { }}
-                styles={{ flex: 1 }}
               />
-              <SpaceComponent width={16} />
-              <ButtonComponent
+              <Edit2
+                variant='Bold'
+                size={sizes.title}
                 color={colors.green}
-                text="Xuất file"
-                onPress={() => { }}
-                styles={{ flex: 1 }}
+                onPress={handleEditPlan}
+              />
+              <Trash
+                variant='Bold'
+                size={sizes.title}
+                color={colors.red}
               />
             </RowComponent>
           }
