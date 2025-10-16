@@ -1,21 +1,44 @@
-import { Profile2User } from 'iconsax-react-native';
-import React from 'react';
-import { Container, RowComponent, SearchComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components';
+import { AddCircle, Profile2User } from 'iconsax-react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  Container,
+  RowComponent,
+  SearchComponent,
+  SectionComponent,
+  SpaceComponent,
+  TextComponent,
+} from '../../components';
 import { colors } from '../../constants/colors';
-import { sizes } from '../../constants/sizes';
-import { ScrollView, View, TouchableOpacity } from 'react-native';
 import { fontFamillies } from '../../constants/fontFamilies';
+import { sizes } from '../../constants/sizes';
+import { ReportModel } from '../../models';
+import { useChildStore, useReportStore } from '../../zustand/store';
 
 const ReportScreen = ({ navigation }: any) => {
+  const { child } = useChildStore();
+  const { reports } = useReportStore();
+  const [reportsApproved, setReportsApproved] = useState<ReportModel[]>([]);
+
+  useEffect(() => {
+    if (reports.length > 0) {
+      setReportsApproved(
+        reports.filter(report => report.status === 'approved'),
+      );
+    }
+  }, [reports]);
+
+  if (!child) return <ActivityIndicator />;
   return (
     <Container
       bg={colors.primaryLight}
-      title="NGUYỄN HOÀNG ĐĂNG (Bin)"
+      title={child.fullName}
       right={
         <Profile2User
           size={sizes.title}
           color={colors.textBold}
           variant="Bold"
+          onPress={() => navigation.navigate('ChildrenScreen')}
         />
       }
     >
@@ -26,39 +49,51 @@ const ReportScreen = ({ navigation }: any) => {
           paddingVertical: 10,
         }}
       >
-        <SearchComponent
-          arrSource={[]}
-          onChange={() => { }}
-          placeholder="Nhập báo cáo"
-          type="searchTarget"
-        />
+        <RowComponent>
+          <SearchComponent
+            styles={{ flex: 1 }}
+            arrSource={reports.filter(report => report.status === 'approved')}
+            onChange={val => setReportsApproved(val)}
+            placeholder="Nhập báo cáo"
+            type="searchReport"
+          />
+          <SpaceComponent width={20} />
+          <AddCircle
+            onPress={() => navigation.navigate('AddReportScreen')}
+            size={sizes.title}
+            color={colors.primary}
+            variant="Bold"
+          />
+        </RowComponent>
         <ScrollView showsVerticalScrollIndicator={false}>
           <SpaceComponent height={6} />
           <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
-            {
-              Array.from({ length: 100 }).map((_, index) =>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('ReportDetailScreen')}
-                  key={index}
-                  style={{
-                    padding: 10,
-                    width: '45%',
-                    alignItems: 'center',
-                    borderWidth: 1,
-                    borderColor: 'coral',
-                    borderRadius: 100,
-                    marginBottom: 10,
-                    marginLeft: 10
-                  }}>
-                  <TextComponent text='BC 10/2025' font={fontFamillies.poppinsBold} />
-                </TouchableOpacity>
-              )
-            }
+            {Array.from({ length: 100 }).map((_, index) => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('ReportDetailScreen')}
+                key={index}
+                style={{
+                  padding: 10,
+                  width: '45%',
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: 'coral',
+                  borderRadius: 100,
+                  marginBottom: 10,
+                  marginLeft: 10,
+                }}
+              >
+                <TextComponent
+                  text="BC 10/2025"
+                  font={fontFamillies.poppinsBold}
+                />
+              </TouchableOpacity>
+            ))}
           </RowComponent>
         </ScrollView>
       </SectionComponent>
     </Container>
   );
-}
+};
 
 export default ReportScreen;

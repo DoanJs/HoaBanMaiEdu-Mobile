@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { StyleProp, View, ViewStyle } from 'react-native';
 import { InputComponent } from '.';
 import { ChildrenModel, PlanModel, TargetModel } from '../models';
 
@@ -7,16 +7,16 @@ interface Props {
   placeholder: string;
   type?: string;
   width?: number | string;
-  arrSource: TargetModel[] | ChildrenModel[]
-  | PlanModel[]
+  arrSource: TargetModel[] | ChildrenModel[] | PlanModel[];
   // | ReportModel[]
   // | SuggestModel[]
   // | UserModel[];
+  styles?: StyleProp<ViewStyle>;
   onChange: (val: any) => void;
 }
 
 export default function SearchComponent(props: Props) {
-  const { placeholder, type, arrSource, onChange, width } = props;
+  const { placeholder, type, arrSource, styles, onChange, width } = props;
   const [value, setValue] = useState('');
 
   useEffect(() => {
@@ -34,9 +34,9 @@ export default function SearchComponent(props: Props) {
           target.fullName.toLowerCase().includes(value.toLowerCase()),
         );
         break;
-      case "searchPlan":
-        items = (arrSource as PlanModel[]).filter((plan) =>
-          plan.title.toLowerCase().includes(value.toLowerCase())
+      case 'searchPlan':
+        items = (arrSource as PlanModel[]).filter(plan =>
+          plan.title.toLowerCase().includes(value.toLowerCase()),
         );
         break;
       //   case "searchReport":
@@ -68,7 +68,7 @@ export default function SearchComponent(props: Props) {
   }, [value]);
 
   return (
-    <View>
+    <View style={styles}>
       <InputComponent
         value={value}
         onChange={val => setValue(val)}

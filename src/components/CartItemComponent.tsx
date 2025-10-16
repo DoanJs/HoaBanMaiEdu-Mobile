@@ -32,12 +32,6 @@ const CartItemComponent = (props: Props) => {
     if (cart && cart.content) {
       setContent(cart.content);
       setIntervention(cart.intervention)
-      // const index = suggests.findIndex((suggest) => suggest.name === cart.content)
-      // if (index !== -1) {
-      //   setSuggest(suggests[index])
-      // } else {
-      //   setType('Ý khác')
-      // }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart]);

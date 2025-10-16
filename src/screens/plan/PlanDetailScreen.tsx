@@ -1,26 +1,47 @@
-import { where } from '@react-native-firebase/firestore'
-import { DocumentDownload, Edit2, Profile2User, Trash } from 'iconsax-react-native'
-import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList } from 'react-native'
-import { ButtonComponent, Container, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
-import { colors } from '../../constants/colors'
-import { convertTargetField } from '../../constants/convertTargetAndField'
-import { getDocsData } from '../../constants/firebase/getDocsData'
-import { fontFamillies } from '../../constants/fontFamilies'
-import { sizes } from '../../constants/sizes'
-import { PlanTaskModel } from '../../models'
-import { useCartEditStore, useCartStore, useChildStore, useFieldStore, useTargetStore, useUserStore } from '../../zustand/store'
-import PlanItemComponent from './PlanItemComponent'
+import { where } from '@react-native-firebase/firestore';
+import {
+  DocumentDownload,
+  Edit2,
+  Profile2User,
+  Trash,
+} from 'iconsax-react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList } from 'react-native';
+import {
+  ButtonComponent,
+  Container,
+  RowComponent,
+  SectionComponent,
+  SpaceComponent,
+  SpinnerComponent,
+  TextComponent,
+} from '../../components';
+import { colors } from '../../constants/colors';
+import { convertTargetField } from '../../constants/convertTargetAndField';
+import { getDocsData } from '../../constants/firebase/getDocsData';
+import { fontFamillies } from '../../constants/fontFamilies';
+import { sizes } from '../../constants/sizes';
+import { PlanTaskModel } from '../../models';
+import {
+  useCartEditStore,
+  useCartStore,
+  useChildStore,
+  useFieldStore,
+  useTargetStore,
+  useUserStore,
+} from '../../zustand/store';
+import PlanItemComponent from './PlanItemComponent';
 
 const PlanDetailScreen = ({ navigation, route }: any) => {
-  const { plan } = route.params
-  const { user } = useUserStore()
-  const { child } = useChildStore()
+  const { plan } = route.params;
+  const { user } = useUserStore();
+  const { child } = useChildStore();
   const { fields } = useFieldStore();
   const { targets } = useTargetStore();
   const { setCarts } = useCartStore();
   const { setCartEdit } = useCartEditStore();
   const [planTasks, setPlanTasks] = useState<PlanTaskModel[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Lấy trực tiếp từ firebase
   useEffect(() => {
@@ -30,10 +51,10 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
       //   setText(comment.split("@Js@")[1]);
       // }
       getDocsData({
-        nameCollect: "planTasks",
+        nameCollect: 'planTasks',
         condition: [
-          where("teacherIds", "array-contains", user?.id),
-          where("planId", "==", plan.id),
+          where('teacherIds', 'array-contains', user?.id),
+          where('planId', '==', plan.id),
         ],
         setData: setPlanTasks,
       });
@@ -41,9 +62,9 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan]);
 
-
   const handleEditPlan = () => {
-    const convertPlanTasksToCarts = planTasks.map((_) => {
+    setIsLoading(true);
+    const convertPlanTasksToCarts = planTasks.map(_ => {
       const { targetId, planId, ...newPlanTask } = _;
       return {
         ...newPlanTask,
@@ -55,10 +76,11 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
     setCarts(convertPlanTasksToCarts);
     setCartEdit(plan.id);
 
-    navigation.navigate('Main', { screen: 'Cart' })
+    setIsLoading(false);
+    navigation.navigate('Main', { screen: 'Cart' });
   };
 
-  if (!child) return <ActivityIndicator />
+  if (!child) return <ActivityIndicator />;
   return (
     <Container
       back
@@ -81,45 +103,51 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
           paddingVertical: 10,
         }}
       >
-        <RowComponent justify='space-between'>
+        <RowComponent justify="space-between">
           <TextComponent text={plan.title} font={fontFamillies.poppinsBold} />
-          <TextComponent text={plan.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
+          <TextComponent
+            text={plan.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
             size={sizes.smallText}
-            styles={{ fontStyle: 'italic' }} />
+            styles={{ fontStyle: 'italic' }}
+          />
         </RowComponent>
         <FlatList
           showsVerticalScrollIndicator={false}
           data={planTasks}
-          renderItem={({ item, index }) => <PlanItemComponent
-            key={item.id}
-            planTask={item}
-            index={index}
-          />}
+          renderItem={({ item, index }) => (
+            <PlanItemComponent key={item.id} planTask={item} index={index} />
+          )}
           ListFooterComponent={
-            <RowComponent justify="space-around" styles={{paddingVertical: 16}}>
-              <DocumentDownload
-                variant='Bold'
-                size={sizes.title}
-                color={colors.blue}
-                onPress={() => { }}
-              />
-              <Edit2
-                variant='Bold'
-                size={sizes.title}
-                color={colors.green}
-                onPress={handleEditPlan}
-              />
-              <Trash
-                variant='Bold'
-                size={sizes.title}
-                color={colors.red}
-              />
+            <RowComponent
+              justify="space-around"
+              styles={{ paddingVertical: 16 }}
+            >
+              {plan.status === 'approved' && (
+                <DocumentDownload
+                  variant="Bold"
+                  size={sizes.title}
+                  color={colors.blue}
+                  onPress={() => {}}
+                />
+              )}
+              {plan.status === 'pending' && (
+                <>
+                  <Edit2
+                    variant="Bold"
+                    size={sizes.title}
+                    color={colors.green}
+                    onPress={handleEditPlan}
+                  />
+                  <Trash variant="Bold" size={sizes.title} color={colors.red} />
+                </>
+              )}
             </RowComponent>
           }
         />
       </SectionComponent>
+      <SpinnerComponent loading={isLoading} />
     </Container>
-  )
-}
+  );
+};
 
-export default PlanDetailScreen
+export default PlanDetailScreen;

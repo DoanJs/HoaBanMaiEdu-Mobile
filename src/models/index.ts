@@ -4,6 +4,7 @@ import { FieldModel } from './FieldModel';
 import { InterventionModel } from './InterventionModel';
 import { PlanModel } from './PlanModel';
 import { PlanTaskModel } from './PlanTaskModel';
+import { ReportModel } from './ReportModel';
 import { SelectModel } from './SelectModel';
 import { SuggestModel } from './SuggestModel';
 import { TargetModel } from './TargetModel';
@@ -21,5 +22,6 @@ export type {
   InterventionModel,
   TimeAtModel,
   PlanModel,
-  PlanTaskModel
+  PlanTaskModel,
+  ReportModel
 };

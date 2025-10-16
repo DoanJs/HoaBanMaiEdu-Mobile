@@ -7,6 +7,7 @@ import MediaScreen from "./media/MediaScreen";
 import PendingScreen from "./pending/PendingScreen";
 import PlanDetailScreen from "./plan/PlanDetailScreen";
 import PlanScreen from "./plan/PlanScreen";
+import AddReportScreen from "./report/AddReportScreen";
 import ReportDetailScreen from "./report/ReportDetailScreen";
 import ReportScreen from "./report/ReportScreen";
 import SettingScreen from "./setting/SettingScreen";
@@ -26,5 +27,6 @@ export {
     ReportDetailScreen,
     ChildrenScreen,
     Login,Register,
-    AuthHomeScreen
+    AuthHomeScreen,
+    AddReportScreen
 };

@@ -5,22 +5,30 @@ import { Container, RowComponent, SearchComponent, SectionComponent, SpaceCompon
 import { colors } from '../../constants/colors'
 import { fontFamillies } from '../../constants/fontFamilies'
 import { sizes } from '../../constants/sizes'
-import { useChildStore, usePlanStore } from '../../zustand/store'
-import { PlanModel } from '../../models'
+import { useChildStore, usePlanStore, useReportStore } from '../../zustand/store'
+import { PlanModel, ReportModel } from '../../models'
 
 const PendingScreen = ({ navigation }: any) => {
   const [selected, setSelected] = useState('Kế hoạch');
   const { child } = useChildStore()
   const { plans } = usePlanStore()
   const [planNews, setPlanNews] = useState<PlanModel[]>([]);
+  const { reports} = useReportStore()
+  const [reportNews, setReportNews] = useState<ReportModel[]>([]);
 
 
   useEffect(() => {
     if (plans.length > 0) {
-      setPlanNews(plans)
+      setPlanNews(plans.filter((plan) => plan.status === "pending"))
     }
   }, [plans])
+  useEffect(() => {
+    if (reports.length > 0) {
+      setReportNews(reports.filter((report) => report.status === "pending"))
+    }
+  }, [reports])
 
+console.log(reportNews)
   if (!child) return <ActivityIndicator />
   return (
     <Container
@@ -106,7 +114,7 @@ const PendingScreen = ({ navigation }: any) => {
                     <TextComponent text={_.title} font={fontFamillies.poppinsBold} />
                   </TouchableOpacity>
                 )
-                : Array.from({ length: 100 }).map((_, index) =>
+                : reportNews.map((_, index) =>
                   <TouchableOpacity
                     onPress={() => navigation.navigate('ReportDetailScreen')}
                     key={index}
@@ -127,38 +135,6 @@ const PendingScreen = ({ navigation }: any) => {
 
           </RowComponent>
         </ScrollView>
-        {/* <ButtonComponent
-          text='KH 10/2025'
-          onPress={() => { }}
-          color={colors.background}
-          styles={{ borderWidth: 1, borderColor: 'coral', width:'50%' }} />
-        <ButtonComponent
-          text='KH 10/2025'
-          onPress={() => { }}
-          color={colors.background}
-          styles={{ borderWidth: 1, borderColor: 'coral', width:'50%' }} /> */}
-        {/* <FlatList
-          showsVerticalScrollIndicator={false}
-          data={Array.from({ length: 10 })}
-          renderItem={({ item, index }) => <CartItemComponent key={index} />}
-          ListFooterComponent={
-            <RowComponent justify="space-around">
-              <ButtonComponent
-                color='coral'
-                text="Lưu nháp"
-                onPress={() => {}}
-                styles={{ flex: 1 }}
-              />
-              <SpaceComponent width={16} />
-              <ButtonComponent
-                color={colors.green}
-                text="Gửi duyệt"
-                onPress={() => {}}
-                styles={{ flex: 1 }}
-              />
-            </RowComponent>
-          }
-        /> */}
       </SectionComponent>
     </Container>
   )

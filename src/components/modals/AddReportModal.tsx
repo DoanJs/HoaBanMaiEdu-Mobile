@@ -9,47 +9,48 @@ import {
 import Modal from 'react-native-modal';
 import { colors } from '../../constants/colors';
 import { fontFamillies } from '../../constants/fontFamilies';
-import { useInterventionStore } from '../../zustand/store';
+import { usePlanStore } from '../../zustand/store';
+import { PlanModel } from '../../models';
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  intervention: string;
-  onChange: (val: string) => void;
+  planSelected: PlanModel | undefined;
+  onChange: (val: PlanModel | undefined) => void;
 }
 
-export default function InterventionModal(props: Props) {
-  const { visible, onClose, intervention, onChange } = props;
-  const { interventions } = useInterventionStore();
+export default function AddReportModal(props: Props) {
+  const { visible, onClose, planSelected, onChange } = props;
+  const { plans } = usePlanStore();
   const [selected, setSelected] = useState('');
 
   useEffect(() => {
-    if (intervention) {
-      setSelected(intervention);
+    if (planSelected) {
+      setSelected(planSelected.title);
     }
-  }, [intervention]);
+  }, [planSelected]);
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
       style={styles.item}
       onPress={() => {
-        setSelected(item.name);
-        onChange(item.name);
+        setSelected(item.title);
+        onChange(item);
       }}
     >
       <Text
         style={[
           styles.itemContent,
           {
-            color: selected === item.name ? colors.green : '#333',
+            color: selected === item.title ? colors.green : '#333',
             fontFamily:
-              selected === item.name
+              selected === item.title
                 ? fontFamillies.poppinsBold
                 : fontFamillies.poppinsRegular,
           },
         ]}
       >
-        {item.name}
+        {item.title}
       </Text>
     </TouchableOpacity>
   );
@@ -64,14 +65,14 @@ export default function InterventionModal(props: Props) {
     >
       <View style={styles.modalBox}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Mức độ hỗ trợ</Text>
+          <Text style={styles.headerText}>Chọn kế hoạch đã được duyệt</Text>
           <TouchableOpacity onPress={onClose}>
             <Text style={styles.closeBtn}>Đóng</Text>
           </TouchableOpacity>
         </View>
 
         <FlatList
-          data={interventions}
+          data={plans.filter(plan => plan.status === 'approved')}
           renderItem={renderItem}
           keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
