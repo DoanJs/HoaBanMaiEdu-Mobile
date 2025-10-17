@@ -12,7 +12,7 @@ export interface CartModel {
   intervention: string;
   childId: string;
   teacherIds: string[];
-  author: string;
+  authorId: string;
 
   createAt: TimeAtModel | FieldValue;
   updateAt: TimeAtModel | FieldValue;

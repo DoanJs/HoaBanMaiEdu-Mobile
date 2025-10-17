@@ -58,7 +58,7 @@ const TargetItemComponent = (props: Props) => {
             intervention: '',
             childId: child.id,
             teacherIds: child.teacherIds,
-            author: user.id,
+            authorId: user.id,
 
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),

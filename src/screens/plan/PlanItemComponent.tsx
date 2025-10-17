@@ -26,7 +26,7 @@ const PlanItemComponent = (props: Props) => {
     }}>
       <RowComponent justify='space-between'>
         <TextComponent text={`${index + 1}. ${convertTargetField(planTask.targetId, targets, fields).nameField}`} font={fontFamillies.poppinsBold} />
-        <TextComponent text='Level 2' font={fontFamillies.poppinsBold} />
+        <TextComponent text={`Level ${convertTargetField(planTask.targetId, targets, fields).levelTarget}`} font={fontFamillies.poppinsBold} />
       </RowComponent>
       <TextComponent text={convertTargetField(planTask.targetId, targets, fields).nameTarget} />
       <TextComponent text={`- ${planTask.intervention !== '' ? planTask.intervention : 'Trống'}`}

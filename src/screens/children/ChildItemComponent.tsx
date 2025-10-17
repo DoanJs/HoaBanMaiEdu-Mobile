@@ -18,7 +18,7 @@ const ChildItemComponent = (props: Props) => {
     <TouchableOpacity
       onPress={() => {
         setChild(child);
-        navigation.navigate('Main');
+        navigation.navigate('MainHome');
       }}
       style={{
         alignItems: 'center',

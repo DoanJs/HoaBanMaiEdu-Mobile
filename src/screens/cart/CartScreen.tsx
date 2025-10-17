@@ -18,12 +18,13 @@ import { TitlePlanModal } from '../../components/modals';
 import { colors } from '../../constants/colors';
 import { addDocData } from '../../constants/firebase/addDocData';
 import { deleteDocData } from '../../constants/firebase/deleteDocData';
+import { getDocData } from '../../constants/firebase/getDocData';
 import { updateDocData } from '../../constants/firebase/updateDocData';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { sizes } from '../../constants/sizes';
-import { useCartEditStore, useCartStore, useChildStore, usePlanStore, useUserStore } from '../../zustand/store';
-import { getDocData } from '../../constants/firebase/getDocData';
 import { PlanModel } from '../../models';
+import { useCartEditStore, useCartStore, useChildStore, usePlanStore, useUserStore } from '../../zustand/store';
+import { groupArrayWithField } from '../../constants/groupArrayWithField';
 
 const CartScreen = ({ navigation }: any) => {
   const { user } = useUserStore()
@@ -35,7 +36,6 @@ const CartScreen = ({ navigation }: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVisibleTitlePlan, setIsVisibleTitlePlan] = useState(false);
   const [plan, setPlan] = useState<PlanModel>();
-
 
   useEffect(() => {
     if (cartEdit) {
@@ -256,7 +256,7 @@ const CartScreen = ({ navigation }: any) => {
 
               <FlatList
                 showsVerticalScrollIndicator={false}
-                data={carts}
+                data={groupArrayWithField(carts, "fieldId")}
                 renderItem={({ item, index }) =>
                   <CartItemComponent
                     key={item.id}
@@ -266,16 +266,22 @@ const CartScreen = ({ navigation }: any) => {
                 ListFooterComponent={
                   carts.length > 0 && title !== '' ?
                     <RowComponent justify="space-around">
+                      {
+                        !cartEdit &&
+                        <>
+                          <ButtonComponent
+                            color="coral"
+                            text="Lưu nháp"
+                            onPress={handleSaveCart}
+                            styles={{ flex: 1 }}
+                          />
+                          <SpaceComponent width={16} />
+                        </>
+                      }
                       <ButtonComponent
-                        color="coral"
-                        text="Lưu nháp"
-                        onPress={handleSaveCart}
-                        styles={{ flex: 1 }}
-                      />
-                      <SpaceComponent width={16} />
-                      <ButtonComponent
-                        color={colors.green}
-                        text="Gửi duyệt"
+                        color={cartEdit ? colors.blue : colors.green}
+                        textStyles={{ color: cartEdit ? colors.background : colors.text }}
+                        text={cartEdit ? 'Lưu' : "Gửi duyệt"}
                         onPress={handleAddEditPlan}
                         styles={{ flex: 1 }}
                       />
@@ -291,7 +297,7 @@ const CartScreen = ({ navigation }: any) => {
                       <SpaceComponent width={16} />
                       <ButtonComponent
                         color={colors.green}
-                        text="Gửi duyệt"
+                        text={"Gửi duyệt"}
                         onPress={() => setIsVisibleTitlePlan(true)}
                         styles={{ flex: 1 }}
                       />

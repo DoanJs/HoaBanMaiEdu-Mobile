@@ -1,16 +1,13 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import TabNavigator from './TabNavigator';
-import { AddReportScreen, ChildrenScreen, PlanDetailScreen, ReportDetailScreen } from '../screens';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ChildrenScreen } from '../screens';
+import MainHomeNavigator from './MainHomeNavigator';
 
 const MainNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="ChildrenScreen" component={ChildrenScreen} />
-      <Stack.Screen name="Main" component={TabNavigator} />
-      <Stack.Screen name="PlanDetailScreen" component={PlanDetailScreen} />
-      <Stack.Screen name="ReportDetailScreen" component={ReportDetailScreen} />
-      <Stack.Screen name="AddReportScreen" component={AddReportScreen} />
+      <Stack.Screen name="MainHome" component={MainHomeNavigator} />
     </Stack.Navigator>
   );
 };

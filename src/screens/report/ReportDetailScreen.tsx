@@ -1,19 +1,22 @@
-import { serverTimestamp, where } from '@react-native-firebase/firestore'
+import { doc, getDoc, serverTimestamp, where } from '@react-native-firebase/firestore'
 import { DocumentDownload, Profile2User, Trash } from 'iconsax-react-native'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, FlatList } from 'react-native'
 import Entypo from 'react-native-vector-icons/Entypo'
+import { db } from '../../../firebase.config'
 import { Container, RowComponent, SectionComponent, SpinnerComponent, TextComponent } from '../../components'
 import { DeleteModal } from '../../components/modals'
 import { colors } from '../../constants/colors'
+import { convertTargetField } from '../../constants/convertTargetAndField'
 import { convertTimeStampFirestore } from '../../constants/convertTimeStampFirestore'
 import { getDocsData } from '../../constants/firebase/getDocsData'
 import { updateDocData } from '../../constants/firebase/updateDocData'
 import { fontFamillies } from '../../constants/fontFamilies'
+import { groupArrayWithField } from '../../constants/groupArrayWithField'
 import { sizes } from '../../constants/sizes'
-import { ReportTaskModel } from '../../models'
-import { useChildStore, useUserStore } from '../../zustand/store'
+import { PlanTaskModel, ReportTaskModel } from '../../models'
+import { useChildStore, useFieldStore, useTargetStore, useUserStore } from '../../zustand/store'
 import ReportItemComponent from './ReportItemComponent'
 
 const ReportDetailScreen = ({ navigation, route }: any) => {
@@ -22,7 +25,10 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
   const { user } = useUserStore()
   const [disable, setDisable] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const { targets } = useTargetStore();
+  const { fields } = useFieldStore();
   const [reportTasks, setReportTasks] = useState<ReportTaskModel[]>([]);
+  const [planTasks, setPlanTasks] = useState<PlanTaskModel[]>([]);
   const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState(false);
 
   // Lấy trực tiếp từ firebase
@@ -43,6 +49,11 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [report]);
+  useEffect(() => {
+    if (reportTasks.length > 0) {
+      getPlanTasks(reportTasks);
+    }
+  }, [reportTasks]);
 
 
   const handleSaveReportTask = async () => {
@@ -69,6 +80,39 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
         setDisable(true);
       }
     }
+  };
+  const getPlanTask = (planTaskId: string, planTasks: PlanTaskModel[]) => {
+    const index = planTasks.findIndex((planTask) => planTask.id === planTaskId);
+    if (index !== -1) {
+      return planTasks[index];
+    }
+  };
+  const getPlanTasks = async (reportTasks: ReportTaskModel[]) => {
+    const promiseItems = reportTasks.map(async (reportTask) => {
+      const docSnap = await getDoc(doc(db, "planTasks", reportTask.planTaskId));
+      return {
+        ...docSnap.data(),
+        id: docSnap.id,
+      };
+    });
+    const result = await Promise.all(promiseItems);
+
+    setPlanTasks(result as PlanTaskModel[]);
+  };
+  const handleGroupReportWithField = (reportTasks: ReportTaskModel[]) => {
+    return groupArrayWithField(
+      reportTasks.map((reportTask) => {
+        return {
+          ...reportTask,
+          fieldId: convertTargetField(
+            getPlanTask(reportTask.planTaskId, planTasks)?.targetId as string,
+            targets,
+            fields
+          ).fieldId,
+        };
+      }),
+      "fieldId"
+    );
   };
 
   if (!child) return <ActivityIndicator />
@@ -120,7 +164,7 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
         </RowComponent>
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={reportTasks}
+          data={handleGroupReportWithField(reportTasks)}
           renderItem={({ item, index }) =>
             <ReportItemComponent
               key={index}

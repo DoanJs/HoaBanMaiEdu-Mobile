@@ -25,16 +25,17 @@ const TargetScreen = ({ navigation }: any) => {
   const { setPlans } = usePlanStore();
   const { setReports } = useReportStore();
 
-  const { data: data_carts, loading: loading_carts } =
-    useFirestoreWithMetaCondition({
-      key: 'cartsCache',
-      metaDoc: 'carts',
-      id: user?.id,
-      nameCollect: 'carts',
-      condition: [
-        where('teacherIds', 'array-contains', user?.id),
-      ] as QueryConstraint[],
-    });
+  // const { data: data_carts, loading: loading_carts } =
+  //   useFirestoreWithMetaCondition({
+  //     key: 'cartsCache',
+  //     metaDoc: 'carts',
+  //     id: user?.id,
+  //     nameCollect: 'carts',
+  //     condition: [
+  //       where('teacherIds', 'array-contains', user?.id),
+  //     ] as QueryConstraint[],
+  //   });
+
   const { data: data_plans, loading: loading_plans } =
     useFirestoreWithMetaCondition({
       key: 'plansCache',
@@ -56,13 +57,13 @@ const TargetScreen = ({ navigation }: any) => {
       ] as QueryConstraint[],
     });
 
-  useEffect(() => {
-    if (!loading_carts) {
-      const items = data_carts as CartModel[];
-      setCarts(items.filter(cart => cart.childId === child?.id));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data_carts, loading_carts]);
+  // useEffect(() => {
+  //   if (!loading_carts) {
+  //     const items = data_carts as CartModel[];
+  //     setCarts(items.filter(cart => cart.childId === child?.id));
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [data_carts, loading_carts]);
   useEffect(() => {
     if (!loading_plans) {
       const items = data_plans as PlanModel[];

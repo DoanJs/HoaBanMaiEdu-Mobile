@@ -32,6 +32,7 @@ import {
   useUserStore,
 } from '../../zustand/store';
 import PlanItemComponent from './PlanItemComponent';
+import { groupArrayWithField } from '../../constants/groupArrayWithField';
 
 const PlanDetailScreen = ({ navigation, route }: any) => {
   const { plan } = route.params;
@@ -73,15 +74,28 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
         targetId: _.targetId,
         fieldId: convertTargetField(_.targetId, targets, fields).fieldId,
         name: convertTargetField(_.targetId, targets, fields).nameTarget,
+        level: convertTargetField(_.targetId, targets, fields).levelTarget
       };
     });
+
     setCarts(convertPlanTasksToCarts);
     setCartEdit(plan.id);
-console.log(convertPlanTasksToCarts)
+
     setIsLoading(false);
     navigation.navigate('Main', { screen: 'Cart' });
   };
-
+  const hanldeGroupPlanWithField = (planTasks: PlanTaskModel[]) => {
+    return groupArrayWithField(
+      planTasks.map((_) => {
+        return {
+          ..._,
+          fieldId: convertTargetField(_.targetId, targets, fields).fieldId,
+        };
+      }),
+      "fieldId"
+    );
+  };
+  
   if (!child) return <ActivityIndicator />;
   return (
     <Container
@@ -132,7 +146,7 @@ console.log(convertPlanTasksToCarts)
         </RowComponent>
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={planTasks}
+          data={hanldeGroupPlanWithField(planTasks)}
           renderItem={({ item, index }) => (
             <PlanItemComponent key={item.id} planTask={item} index={index} />
           )}

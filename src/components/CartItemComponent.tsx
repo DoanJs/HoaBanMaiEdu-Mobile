@@ -64,7 +64,7 @@ const CartItemComponent = (props: Props) => {
           font={fontFamillies.poppinsBold}
         />
         <TextComponent
-          text="Level 2"
+          text={`Level ${cart.level}`}
           size={sizes.subText}
           font={fontFamillies.poppinsBold}
         />

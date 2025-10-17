@@ -33,6 +33,7 @@ const ReportScreen = ({ navigation }: any) => {
     <Container
       bg={colors.primaryLight}
       title={child.fullName}
+      uri={child.avatar}
       right={
         <Profile2User
           size={sizes.title}

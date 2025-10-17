@@ -1,5 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { auth, onAuthStateChanged } from './firebase.config';
 import { AuthNavigator, MainNavigator } from './src/router';
