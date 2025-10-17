@@ -1,6 +1,7 @@
 import React from 'react'
 import { View } from 'react-native'
 import { RowComponent, TextComponent } from '../../components'
+import { colors } from '../../constants/colors'
 import { convertTargetField } from '../../constants/convertTargetAndField'
 import { fontFamillies } from '../../constants/fontFamilies'
 import { PlanTaskModel } from '../../models'
@@ -28,8 +29,14 @@ const PlanItemComponent = (props: Props) => {
         <TextComponent text='Level 2' font={fontFamillies.poppinsBold} />
       </RowComponent>
       <TextComponent text={convertTargetField(planTask.targetId, targets, fields).nameTarget} />
-      <TextComponent text={`- ${planTask.intervention !== '' ? planTask.intervention : 'Trống'}`} styles={{ fontStyle: planTask.intervention !== '' ? 'normal' : 'italic' }} />
-      <TextComponent text={`- ${planTask.content !== '' ? planTask.content : 'Trống'}`} styles={{ fontStyle: planTask.intervention !== '' ? 'normal' : 'italic' }} />
+      <TextComponent text={`- ${planTask.intervention !== '' ? planTask.intervention : 'Trống'}`}
+        styles={{ fontStyle: planTask.intervention !== '' ? 'normal' : 'italic' }}
+        color={planTask.intervention !== '' ? colors.text : colors.orange}
+      />
+      <TextComponent text={`- ${planTask.content !== '' ? planTask.content : 'Trống'}`}
+        styles={{ fontStyle: planTask.intervention !== '' ? 'normal' : 'italic' }}
+        color={planTask.content !== '' ? colors.text : colors.orange}
+      />
     </View>
   )
 }

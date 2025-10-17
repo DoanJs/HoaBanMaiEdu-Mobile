@@ -13,7 +13,7 @@ const PendingScreen = ({ navigation }: any) => {
   const { child } = useChildStore()
   const { plans } = usePlanStore()
   const [planNews, setPlanNews] = useState<PlanModel[]>([]);
-  const { reports} = useReportStore()
+  const { reports } = useReportStore()
   const [reportNews, setReportNews] = useState<ReportModel[]>([]);
 
 
@@ -28,7 +28,6 @@ const PendingScreen = ({ navigation }: any) => {
     }
   }, [reports])
 
-console.log(reportNews)
   if (!child) return <ActivityIndicator />
   return (
     <Container
@@ -85,7 +84,9 @@ console.log(reportNews)
         <SpaceComponent height={10} />
 
         <SearchComponent
-          arrSource={selected === 'Kế hoạch' ? plans : []}
+          arrSource={selected === 'Kế hoạch'
+            ? plans.filter((plan) => plan.status === "pending")
+            : reports.filter((report) => report.status === "pending")}
           onChange={selected === 'Kế hoạch' ? (val) => setPlanNews(val) : () => { }}
           placeholder={`Nhập ${selected === 'Kế hoạch' ? 'kế hoạch' : 'báo cáo'}`}
           type="searchPlan"
@@ -99,7 +100,7 @@ console.log(reportNews)
               selected === 'Kế hoạch'
                 ? planNews.map((_, index) =>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate('PlanDetailScreen', {plan: _})}
+                    onPress={() => navigation.navigate('PlanDetailScreen', { plan: _ })}
                     key={index}
                     style={{
                       padding: 10,
@@ -116,7 +117,7 @@ console.log(reportNews)
                 )
                 : reportNews.map((_, index) =>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate('ReportDetailScreen')}
+                    onPress={() => navigation.navigate('ReportDetailScreen', { report: _ })}
                     key={index}
                     style={{
                       padding: 10,
@@ -128,7 +129,7 @@ console.log(reportNews)
                       marginBottom: 10,
                       marginLeft: 10
                     }}>
-                    <TextComponent text='BC 10/2025' font={fontFamillies.poppinsBold} />
+                    <TextComponent text={_.title} font={fontFamillies.poppinsBold} />
                   </TouchableOpacity>
                 )
             }

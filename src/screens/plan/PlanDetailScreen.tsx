@@ -5,19 +5,20 @@ import {
   Profile2User,
   Trash,
 } from 'iconsax-react-native';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList } from 'react-native';
 import {
-  ButtonComponent,
   Container,
   RowComponent,
   SectionComponent,
-  SpaceComponent,
   SpinnerComponent,
-  TextComponent,
+  TextComponent
 } from '../../components';
+import { DeleteModal } from '../../components/modals';
 import { colors } from '../../constants/colors';
 import { convertTargetField } from '../../constants/convertTargetAndField';
+import { convertTimeStampFirestore } from '../../constants/convertTimeStampFirestore';
 import { getDocsData } from '../../constants/firebase/getDocsData';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { sizes } from '../../constants/sizes';
@@ -42,6 +43,7 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
   const { setCartEdit } = useCartEditStore();
   const [planTasks, setPlanTasks] = useState<PlanTaskModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState(false);
 
   // Lấy trực tiếp từ firebase
   useEffect(() => {
@@ -75,7 +77,7 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
     });
     setCarts(convertPlanTasksToCarts);
     setCartEdit(plan.id);
-
+console.log(convertPlanTasksToCarts)
     setIsLoading(false);
     navigation.navigate('Main', { screen: 'Cart' });
   };
@@ -105,6 +107,23 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
       >
         <RowComponent justify="space-between">
           <TextComponent text={plan.title} font={fontFamillies.poppinsBold} />
+          {convertTimeStampFirestore(plan?.createAt) !==
+            convertTimeStampFirestore(plan?.updateAt) ? (
+            <TextComponent
+              styles={{ fontStyle: "italic" }}
+              text={`Cập nhật: ${moment(
+                convertTimeStampFirestore(plan?.updateAt)
+              ).format("HH:mm:ss DD/MM/YYYY")}`}
+              size={sizes.smallText}
+            />
+          ) :
+            <TextComponent
+              styles={{ fontStyle: "italic" }}
+              text={`Gửi lên: ${moment(
+                convertTimeStampFirestore(plan?.createAt)
+              ).format("HH:mm:ss_DD/MM/YYYY")}`}
+              size={sizes.smallText}
+            />}
           <TextComponent
             text={plan.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
             size={sizes.smallText}
@@ -125,26 +144,38 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
               {plan.status === 'approved' && (
                 <DocumentDownload
                   variant="Bold"
-                  size={sizes.title}
+                  size={sizes.extraTitle}
                   color={colors.blue}
-                  onPress={() => {}}
+                  onPress={() => { }}
                 />
               )}
               {plan.status === 'pending' && (
                 <>
                   <Edit2
                     variant="Bold"
-                    size={sizes.title}
+                    size={sizes.extraTitle}
                     color={colors.green}
                     onPress={handleEditPlan}
                   />
-                  <Trash variant="Bold" size={sizes.title} color={colors.red} />
+                  <Trash variant="Bold" size={sizes.extraTitle}
+                    color={colors.red}
+                    onPress={() => setIsVisibleDeleteModal(true)}
+                  />
                 </>
               )}
             </RowComponent>
           }
         />
       </SectionComponent>
+
+      <DeleteModal data={{
+        id: plan.id,
+        type: 'planPending',
+        itemTasks: planTasks
+      }}
+        visible={isVisibleDeleteModal}
+        onClose={() => setIsVisibleDeleteModal(false)}
+      />
       <SpinnerComponent loading={isLoading} />
     </Container>
   );

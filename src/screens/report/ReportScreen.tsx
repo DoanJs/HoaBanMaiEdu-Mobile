@@ -68,9 +68,9 @@ const ReportScreen = ({ navigation }: any) => {
         <ScrollView showsVerticalScrollIndicator={false}>
           <SpaceComponent height={6} />
           <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
-            {Array.from({ length: 100 }).map((_, index) => (
+            {reportsApproved.map((_, index) => (
               <TouchableOpacity
-                onPress={() => navigation.navigate('ReportDetailScreen')}
+                onPress={() => navigation.navigate('ReportDetailScreen', { report: _ })}
                 key={index}
                 style={{
                   padding: 10,
@@ -84,7 +84,7 @@ const ReportScreen = ({ navigation }: any) => {
                 }}
               >
                 <TextComponent
-                  text="BC 10/2025"
+                  text={_.title}
                   font={fontFamillies.poppinsBold}
                 />
               </TouchableOpacity>

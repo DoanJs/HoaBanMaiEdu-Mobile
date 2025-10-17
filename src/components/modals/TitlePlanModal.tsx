@@ -15,10 +15,12 @@ interface Props {
   setTitle: any
   onClose: () => void
   onChange: (val: string) => void
+  handleAddEditPlan: () => void
 }
 
 export default function TitlePlanModal(props: Props) {
-  const { visible, title, setTitle, onClose, onChange } = props
+  const { visible, title, setTitle, onClose, onChange, handleAddEditPlan } = props
+
 
   return (
     <Modal
@@ -55,6 +57,16 @@ export default function TitlePlanModal(props: Props) {
             setTitle(val)
           }}
         />
+
+        <View style={styles.actionRow}>
+          <TouchableOpacity onPress={onClose} style={[styles.button, styles.cancel]}>
+            <Text style={styles.buttonText}>Hủy</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={handleAddEditPlan} style={[styles.button, styles.confirm]}>
+            <Text style={styles.buttonText}>Đồng ý</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );
@@ -126,5 +138,22 @@ const styles = StyleSheet.create({
   confirmText: {
     color: '#fff',
     fontWeight: '600',
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 10,
+    marginHorizontal: 5,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  cancel: {
+    backgroundColor: "#ccc",
+  },
+  confirm: {
+    backgroundColor: "#007bff",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });

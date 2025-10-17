@@ -23,7 +23,7 @@ import {
   useReportStore,
   useUserStore,
 } from '../../zustand/store';
-import ReportItemComponent from './ReportItemComponent';
+import AddReportItemComponent from './AddReportItemComponent';
 
 const AddReportScreen = ({ navigation }: any) => {
   const { child } = useChildStore();
@@ -61,6 +61,7 @@ const AddReportScreen = ({ navigation }: any) => {
     setAddReports(addReports);
   };
   const handleAddReport = async () => {
+    console.log(addReports)
     if (user && child) {
       setIsLoading(true);
       await addDocData({
@@ -94,7 +95,7 @@ const AddReportScreen = ({ navigation }: any) => {
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),
           });
-          const promiseItems = addReports.map(_ =>
+          const promiseItems = addReports.map((_) =>
             addDocData({
               nameCollect: 'reportTasks',
               value: {
@@ -166,7 +167,7 @@ const AddReportScreen = ({ navigation }: any) => {
             showsVerticalScrollIndicator={false}
             data={addReports}
             renderItem={({ item, index }) => (
-              <ReportItemComponent
+              <AddReportItemComponent
                 key={item.id}
                 index={index}
                 addReport={item}

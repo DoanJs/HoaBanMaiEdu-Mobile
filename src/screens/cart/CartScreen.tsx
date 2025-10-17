@@ -1,5 +1,5 @@
 import { collection, getDocs, query, serverTimestamp, where } from '@react-native-firebase/firestore';
-import { Profile2User } from 'iconsax-react-native';
+import { AddCircle, Profile2User } from 'iconsax-react-native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import { db } from '../../../firebase.config';
@@ -36,7 +36,7 @@ const CartScreen = ({ navigation }: any) => {
   const [isVisibleTitlePlan, setIsVisibleTitlePlan] = useState(false);
   const [plan, setPlan] = useState<PlanModel>();
 
-  
+
   useEffect(() => {
     if (cartEdit) {
       getDocData({ id: cartEdit, nameCollect: "plans", setData: setPlan });
@@ -229,18 +229,28 @@ const CartScreen = ({ navigation }: any) => {
         {
           carts.length > 0 ?
             <>
-              <InputComponent
-                styles={{
-                  backgroundColor: colors.background,
-                  borderRadius: 5,
-                }}
-                allowClear
-                placeholder="Tên kế hoạch: "
-                placeholderTextColor={colors.text}
-                color={colors.gray}
-                value={title}
-                onChange={val => setTitle(val)}
-              />
+              <RowComponent>
+                <InputComponent
+                  styles={{
+                    backgroundColor: colors.background,
+                    borderRadius: 5,
+                    flex: 1
+                  }}
+                  allowClear
+                  placeholder="Tên kế hoạch: "
+                  placeholderTextColor={colors.text}
+                  color={colors.gray}
+                  value={title}
+                  onChange={val => setTitle(val)}
+                />
+                <SpaceComponent width={20} />
+                <AddCircle
+                  onPress={() => navigation.navigate('Target')}
+                  size={sizes.title}
+                  color={colors.primary}
+                  variant="Bold"
+                />
+              </RowComponent>
 
               <SpaceComponent height={10} />
 
@@ -313,6 +323,7 @@ const CartScreen = ({ navigation }: any) => {
         setTitle={setTitle}
         onChange={(val) => setTitle(val)}
         onClose={() => setIsVisibleTitlePlan(false)}
+        handleAddEditPlan={handleAddEditPlan}
       />
     </Container>
   );
