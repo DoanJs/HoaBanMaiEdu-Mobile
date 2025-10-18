@@ -43,6 +43,7 @@ import {
   usePlanStore,
   useUserStore,
 } from '../../zustand/store';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const CartScreen = ({ navigation }: any) => {
   const { user } = useUserStore();
@@ -293,62 +294,67 @@ const CartScreen = ({ navigation }: any) => {
 
             <SpaceComponent height={10} />
 
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              data={groupArrayWithField(carts, 'fieldId')}
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }
-              renderItem={({ item, index }) => (
-                <CartItemComponent key={item.id} index={index} cart={item} />
-              )}
-              ListFooterComponent={
-                carts.length > 0 ? (
-                  <RowComponent justify="space-around">
-                    {title === '' ? (
-                      <>
-                        <ButtonComponent
-                          color="coral"
-                          text="Lưu nháp"
-                          onPress={handleSaveCart}
-                          styles={{ flex: 1 }}
-                        />
-                        <SpaceComponent width={16} />
-                        <ButtonComponent
-                          color={colors.green}
-                          text={'Gửi duyệt'}
-                          onPress={() => setIsVisibleTitlePlan(true)}
-                          styles={{ flex: 1 }}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        {!cartEdit && (
+            <GestureHandlerRootView>
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={groupArrayWithField(carts, 'fieldId')}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
+                }
+                renderItem={({ item, index }) => (
+                  <CartItemComponent key={item.id} index={index} cart={item} />
+                )}
+                ListFooterComponent={
+                  carts.length > 0 ? (
+                    <RowComponent justify="space-around">
+                      {title === '' ? (
+                        <>
                           <ButtonComponent
                             color="coral"
                             text="Lưu nháp"
                             onPress={handleSaveCart}
                             styles={{ flex: 1 }}
                           />
-                        )}
-                        <SpaceComponent width={16} />
-                        <ButtonComponent
-                          color={cartEdit ? colors.blue : colors.green}
-                          textStyles={{
-                            color: cartEdit ? colors.background : colors.text,
-                          }}
-                          text={cartEdit ? 'Lưu' : 'Gửi duyệt'}
-                          onPress={handleAddEditPlan}
-                          styles={{ flex: 1 }}
-                        />
-                      </>
-                    )}
-                  </RowComponent>
-                ) : (
-                  <></>
-                )
-              }
-            />
+                          <SpaceComponent width={16} />
+                          <ButtonComponent
+                            color={colors.green}
+                            text={'Gửi duyệt'}
+                            onPress={() => setIsVisibleTitlePlan(true)}
+                            styles={{ flex: 1 }}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          {!cartEdit && (
+                            <ButtonComponent
+                              color="coral"
+                              text="Lưu nháp"
+                              onPress={handleSaveCart}
+                              styles={{ flex: 1 }}
+                            />
+                          )}
+                          <SpaceComponent width={16} />
+                          <ButtonComponent
+                            color={cartEdit ? colors.blue : colors.green}
+                            textStyles={{
+                              color: cartEdit ? colors.background : colors.text,
+                            }}
+                            text={cartEdit ? 'Lưu' : 'Gửi duyệt'}
+                            onPress={handleAddEditPlan}
+                            styles={{ flex: 1 }}
+                          />
+                        </>
+                      )}
+                    </RowComponent>
+                  ) : (
+                    <></>
+                  )
+                }
+              />
+            </GestureHandlerRootView>
           </>
         ) : (
           <RowComponent justify="center">

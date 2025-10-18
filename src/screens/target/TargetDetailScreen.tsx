@@ -1,10 +1,16 @@
+import { where } from '@react-native-firebase/firestore';
 import {
   ArrowRotateLeft,
   Profile2User,
   TickCircle,
 } from 'iconsax-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  View,
+} from 'react-native';
 import {
   Container,
   RowComponent,
@@ -17,27 +23,42 @@ import {
 } from '../../components';
 import { colors } from '../../constants/colors';
 import { deleteDocData } from '../../constants/firebase/deleteDocData';
+import { getDocsData } from '../../constants/firebase/getDocsData';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { showUIIconTarget } from '../../constants/showUIIconTarget';
 import { sizes } from '../../constants/sizes';
-import { TargetModel } from '../../models';
+import { PlanTaskModel, TargetModel } from '../../models';
 import {
   useCartStore,
   useChildStore,
   useTargetStore,
+  useUserStore,
 } from '../../zustand/store';
-import { getDocsData } from '../../constants/firebase/getDocsData';
 
 const TargetDetailScreen = ({ navigation, route }: any) => {
   const { field } = route.params;
+  const { user } = useUserStore();
   const { child } = useChildStore();
   const { targets, setTargets } = useTargetStore();
   const { carts, setCarts } = useCartStore();
   const [targetsField, setTargetsField] = useState<TargetModel[]>([]);
   const [targetsNew, setTargetsNew] = useState<TargetModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-    const [refreshing, setRefreshing] = useState(false); // loading khi kéo xuống
+  const [planTasks, setPlanTasks] = useState<PlanTaskModel[]>([]);
+  const [refreshing, setRefreshing] = useState(false); // loading khi kéo xuống
 
+  useEffect(() => {
+    if (child) {
+      getDocsData({
+        nameCollect: 'planTasks',
+        condition: [
+          where('teacherIds', 'array-contains', user?.id),
+          where('childId', '==', child.id),
+        ],
+        setData: setPlanTasks,
+      });
+    }
+  }, [child]);
   useEffect(() => {
     if (targets) {
       setTargetsField(
@@ -171,6 +192,7 @@ const TargetDetailScreen = ({ navigation, route }: any) => {
               key={item.id}
               target={item}
               setIsLoading={setIsLoading}
+              planTasks={planTasks}
             />
           )}
         />

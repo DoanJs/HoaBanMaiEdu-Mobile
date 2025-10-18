@@ -6,16 +6,17 @@ import { colors } from '../constants/colors';
 import { addDocData } from '../constants/firebase/addDocData';
 import { deleteDocData } from '../constants/firebase/deleteDocData';
 import { fontFamillies } from '../constants/fontFamilies';
-import { TargetModel } from '../models';
+import { PlanTaskModel, TargetModel } from '../models';
 import { useCartStore, useChildStore, useUserStore } from '../zustand/store';
 
 interface Props {
   target: TargetModel;
   setIsLoading: any;
+  planTasks: PlanTaskModel[];
 }
 
 const TargetItemComponent = (props: Props) => {
-  const { target, setIsLoading } = props;
+  const { target, setIsLoading, planTasks } = props;
   const { user } = useUserStore();
   const { child } = useChildStore();
   const { carts, removeCart, addCart } = useCartStore();
@@ -31,7 +32,19 @@ const TargetItemComponent = (props: Props) => {
 
     return status;
   };
+  const isSelectedTarget = () => {
+    let isSelected: boolean = false;
+    const index = planTasks.findIndex(
+      planTask => planTask.targetId === target.id,
+    );
+    if (index !== -1) {
+      isSelected = true;
+    } else {
+      isSelected = false;
+    }
 
+    return isSelected;
+  };
   const handleSelected = async () => {
     if (user && child) {
       const index = carts.findIndex(cart => cart.targetId === target.id);
@@ -98,8 +111,15 @@ const TargetItemComponent = (props: Props) => {
           : colors.background,
       }}
     >
-      <TextComponent styles={{ textAlign: 'justify' }} text={target.name} />
       <TextComponent
+        styles={{
+          textAlign: 'justify',
+          color: isSelectedTarget() ? colors.orange : colors.text,
+        }}
+        text={target.name}
+      />
+      <TextComponent
+        styles={{ color: isSelectedTarget() ? colors.orange : colors.text }}
         text={`Level: ${target.level}`}
         font={fontFamillies.poppinsBold}
       />

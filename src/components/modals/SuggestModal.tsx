@@ -64,7 +64,7 @@ export default function SuggestModal(props: Props) {
     >
       <View style={styles.modalBox}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Nội dung gợi ý</Text>
+          <Text style={styles.headerText}>Gợi ý</Text>
           <TouchableOpacity onPress={onClose}>
             <Text style={styles.closeBtn}>Đóng</Text>
           </TouchableOpacity>
