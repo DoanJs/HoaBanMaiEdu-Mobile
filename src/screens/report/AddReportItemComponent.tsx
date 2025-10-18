@@ -4,6 +4,7 @@ import { InputComponent, RowComponent, TextComponent } from '../../components';
 import { convertTargetField } from '../../constants/convertTargetAndField';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { useFieldStore, useTargetStore } from '../../zustand/store';
+import { colors } from '../../constants/colors';
 
 interface Props {
   index: number;
@@ -47,8 +48,21 @@ const AddReportItemComponent = (props: Props) => {
           convertTargetField(addReport.targetId, targets, fields).nameTarget
         }
       />
-      <TextComponent text={`- ${addReport.intervention !== '' ? addReport.intervention : 'Trống'}`} styles={{ fontStyle: addReport.intervention !== '' ? 'normal' : 'italic' }} />
-      <TextComponent textAlign="justify" text={`- ${addReport.content !== '' ? addReport.content : 'Trống'}`} styles={{ fontStyle: addReport.content !== '' ? 'normal' : 'italic' }} />
+      <TextComponent
+        text={`- ${
+          addReport.intervention !== '' ? addReport.intervention : 'Trống'
+        }`}
+        styles={{
+          fontStyle: addReport.intervention !== '' ? 'normal' : 'italic',
+        }}
+        color={addReport.intervention !== '' ? colors.text : colors.orange}
+      />
+      <TextComponent
+        textAlign="justify"
+        text={`- ${addReport.content !== '' ? addReport.content : 'Trống'}`}
+        styles={{ fontStyle: addReport.content !== '' ? 'normal' : 'italic' }}
+        color={addReport.content !== '' ? colors.text : colors.orange}
+      />
 
       <InputComponent
         textStyles={{

@@ -89,11 +89,13 @@ const TargetItemComponent = (props: Props) => {
       onPress={handleSelected}
       style={{
         borderWidth: 1,
-        borderColor: colors.textBold,
+        borderColor: colors.primary + '80',
         borderRadius: 10,
         padding: 10,
         marginBottom: 8,
-        backgroundColor: showSelected() ? colors.green : colors.background,
+        backgroundColor: showSelected()
+          ? colors.primary + '80'
+          : colors.background,
       }}
     >
       <TextComponent styles={{ textAlign: 'justify' }} text={target.name} />

@@ -1,6 +1,7 @@
+import { where } from '@react-native-firebase/firestore';
 import { AddCircle, Profile2User } from 'iconsax-react-native';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, RefreshControl, ScrollView, TouchableOpacity } from 'react-native';
 import {
   Container,
   RowComponent,
@@ -10,15 +11,22 @@ import {
   TextComponent,
 } from '../../components';
 import { colors } from '../../constants/colors';
+import { getDocsData } from '../../constants/firebase/getDocsData';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { sizes } from '../../constants/sizes';
 import { ReportModel } from '../../models';
-import { useChildStore, useReportStore } from '../../zustand/store';
+import {
+  useChildStore,
+  useReportStore,
+  useUserStore,
+} from '../../zustand/store';
 
 const ReportScreen = ({ navigation }: any) => {
   const { child } = useChildStore();
-  const { reports } = useReportStore();
+  const { user } = useUserStore();
+  const { reports, setReports } = useReportStore();
   const [reportsApproved, setReportsApproved] = useState<ReportModel[]>([]);
+  const [refreshing, setRefreshing] = useState(false); // loading khi kéo xuống
 
   useEffect(() => {
     if (reports.length > 0) {
@@ -27,6 +35,19 @@ const ReportScreen = ({ navigation }: any) => {
       );
     }
   }, [reports]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      getDocsData({
+        nameCollect: 'reports',
+        condition: [where('teacherIds', 'array-contains', user?.id)],
+        setData: setReports,
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   if (!child) return <ActivityIndicator />;
   return (
@@ -66,12 +87,19 @@ const ReportScreen = ({ navigation }: any) => {
             variant="Bold"
           />
         </RowComponent>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <SpaceComponent height={6} />
           <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
             {reportsApproved.map((_, index) => (
               <TouchableOpacity
-                onPress={() => navigation.navigate('ReportDetailScreen', { report: _ })}
+                onPress={() =>
+                  navigation.navigate('ReportDetailScreen', { report: _ })
+                }
                 key={index}
                 style={{
                   padding: 10,

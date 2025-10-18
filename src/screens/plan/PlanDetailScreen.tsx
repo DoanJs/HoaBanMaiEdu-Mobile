@@ -1,7 +1,10 @@
 import { where } from '@react-native-firebase/firestore';
 import {
+  ArchiveTick,
   DocumentDownload,
   Edit2,
+  MessageAdd,
+  MessageNotif,
   Profile2User,
   Trash,
 } from 'iconsax-react-native';
@@ -13,14 +16,16 @@ import {
   RowComponent,
   SectionComponent,
   SpinnerComponent,
-  TextComponent
+  TextComponent,
 } from '../../components';
-import { DeleteModal } from '../../components/modals';
+import { CommentModal, DeleteModal } from '../../components/modals';
 import { colors } from '../../constants/colors';
 import { convertTargetField } from '../../constants/convertTargetAndField';
 import { convertTimeStampFirestore } from '../../constants/convertTimeStampFirestore';
 import { getDocsData } from '../../constants/firebase/getDocsData';
+import { updateDocData } from '../../constants/firebase/updateDocData';
 import { fontFamillies } from '../../constants/fontFamilies';
+import { groupArrayWithField } from '../../constants/groupArrayWithField';
 import { sizes } from '../../constants/sizes';
 import { PlanTaskModel } from '../../models';
 import {
@@ -28,11 +33,11 @@ import {
   useCartStore,
   useChildStore,
   useFieldStore,
+  usePlanStore,
   useTargetStore,
   useUserStore,
 } from '../../zustand/store';
 import PlanItemComponent from './PlanItemComponent';
-import { groupArrayWithField } from '../../constants/groupArrayWithField';
 
 const PlanDetailScreen = ({ navigation, route }: any) => {
   const { plan } = route.params;
@@ -42,17 +47,22 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
   const { targets } = useTargetStore();
   const { setCarts } = useCartStore();
   const { setCartEdit } = useCartEditStore();
+  const { plans, editPlan } = usePlanStore();
   const [planTasks, setPlanTasks] = useState<PlanTaskModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isComment, setIsComment] = useState(false);
+  const [text, setText] = useState('');
+  const [disable, setDisable] = useState(true);
   const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState(false);
+  const [isVisibleCommentModal, setIsVisibleCommentModal] = useState(false);
 
   // Lấy trực tiếp từ firebase
   useEffect(() => {
     if (plan) {
-      // if (comment) {
-      //   setIsComment(true);
-      //   setText(comment.split("@Js@")[1]);
-      // }
+      if (plan.comment) {
+        setIsComment(true);
+        setText(plan.comment.split('@Js@')[1]);
+      }
       getDocsData({
         nameCollect: 'planTasks',
         condition: [
@@ -64,6 +74,14 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan]);
+  useEffect(() => {
+    if (text !== plan.comment?.split('@Js@')[1]) {
+      setDisable(false);
+    } else {
+      setDisable(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text]);
 
   const handleEditPlan = () => {
     setIsLoading(true);
@@ -74,7 +92,7 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
         targetId: _.targetId,
         fieldId: convertTargetField(_.targetId, targets, fields).fieldId,
         name: convertTargetField(_.targetId, targets, fields).nameTarget,
-        level: convertTargetField(_.targetId, targets, fields).levelTarget
+        level: convertTargetField(_.targetId, targets, fields).levelTarget,
       };
     });
 
@@ -86,16 +104,52 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
   };
   const hanldeGroupPlanWithField = (planTasks: PlanTaskModel[]) => {
     return groupArrayWithField(
-      planTasks.map((_) => {
+      planTasks.map(_ => {
         return {
           ..._,
           fieldId: convertTargetField(_.targetId, targets, fields).fieldId,
         };
       }),
-      "fieldId"
+      'fieldId',
     );
   };
-  
+  const handleSaveComment = async () => {
+    setIsLoading(true);
+    const indexPlan = plans.findIndex(_ => _.id === plan.id);
+    editPlan(plan.id, {
+      ...plans[indexPlan],
+      comment: text ? `${user?.fullName}@Js@${text}` : '',
+    });
+    await updateDocData({
+      nameCollect: 'plans',
+      id: plan.id,
+      metaDoc: 'plans',
+      valueUpdate: { comment: text ? `${user?.fullName}@Js@${text}` : '' },
+    });
+    setIsLoading(false);
+    setDisable(true);
+  };
+  const handleApproved = () => {
+    const indexPlan = plans.findIndex(_ => _.id === plan.id);
+    editPlan(plan.id, { ...plans[indexPlan], status: 'approved' });
+
+    setIsLoading(true);
+    updateDocData({
+      nameCollect: 'plans',
+      id: plan.id,
+      valueUpdate: { status: 'approved' },
+      metaDoc: 'plans',
+    })
+      .then(() => {
+        setIsLoading(false);
+        navigation.navigate('Main', { screen: 'Plan' });
+      })
+      .catch(error => {
+        setIsLoading(false);
+        console.log(error);
+      });
+  };
+
   if (!child) return <ActivityIndicator />;
   return (
     <Container
@@ -121,23 +175,41 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
       >
         <RowComponent justify="space-between">
           <TextComponent text={plan.title} font={fontFamillies.poppinsBold} />
+          {isComment && plan.status === 'pending' && (
+            <MessageNotif
+              size={sizes.title}
+              color={colors.red}
+              variant="Bold"
+              onPress={() => setIsVisibleCommentModal(true)}
+            />
+          )}
+          {!isComment && plan.status === 'pending' &&
+            ['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
+              <MessageAdd
+                size={sizes.title}
+                color={colors.green}
+                variant="Bold"
+                onPress={() => setIsVisibleCommentModal(true)}
+              />
+            )}
           {convertTimeStampFirestore(plan?.createAt) !==
-            convertTimeStampFirestore(plan?.updateAt) ? (
+          convertTimeStampFirestore(plan?.updateAt) ? (
             <TextComponent
-              styles={{ fontStyle: "italic" }}
+              styles={{ fontStyle: 'italic' }}
               text={`Cập nhật: ${moment(
-                convertTimeStampFirestore(plan?.updateAt)
-              ).format("HH:mm:ss DD/MM/YYYY")}`}
+                convertTimeStampFirestore(plan?.updateAt),
+              ).format('HH:mm:ss DD/MM/YYYY')}`}
               size={sizes.smallText}
             />
-          ) :
+          ) : (
             <TextComponent
-              styles={{ fontStyle: "italic" }}
+              styles={{ fontStyle: 'italic' }}
               text={`Gửi lên: ${moment(
-                convertTimeStampFirestore(plan?.createAt)
-              ).format("HH:mm:ss_DD/MM/YYYY")}`}
+                convertTimeStampFirestore(plan?.createAt),
+              ).format('HH:mm:ss_DD/MM/YYYY')}`}
               size={sizes.smallText}
-            />}
+            />
+          )}
           <TextComponent
             text={plan.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
             size={sizes.smallText}
@@ -160,18 +232,28 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
                   variant="Bold"
                   size={sizes.extraTitle}
                   color={colors.blue}
-                  onPress={() => { }}
+                  onPress={() => {}}
                 />
               )}
               {plan.status === 'pending' && (
                 <>
+                  {user?.role === 'admin' && (
+                    <ArchiveTick
+                      variant="Bold"
+                      size={sizes.extraTitle}
+                      color={colors.green}
+                      onPress={handleApproved}
+                    />
+                  )}
                   <Edit2
                     variant="Bold"
                     size={sizes.extraTitle}
-                    color={colors.green}
+                    color={colors.blue2}
                     onPress={handleEditPlan}
                   />
-                  <Trash variant="Bold" size={sizes.extraTitle}
+                  <Trash
+                    variant="Bold"
+                    size={sizes.extraTitle}
                     color={colors.red}
                     onPress={() => setIsVisibleDeleteModal(true)}
                   />
@@ -182,13 +264,23 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
         />
       </SectionComponent>
 
-      <DeleteModal data={{
-        id: plan.id,
-        type: 'planPending',
-        itemTasks: planTasks
-      }}
+      <DeleteModal
+        data={{
+          id: plan.id,
+          type: 'planPending',
+          itemTasks: planTasks,
+        }}
         visible={isVisibleDeleteModal}
         onClose={() => setIsVisibleDeleteModal(false)}
+      />
+      <CommentModal
+        visible={isVisibleCommentModal}
+        disable={disable}
+        onClose={() => setIsVisibleCommentModal(false)}
+        value={text}
+        comment={plan.comment}
+        onChange={val => setText(val)}
+        handleSaveComment={handleSaveComment}
       />
       <SpinnerComponent loading={isLoading} />
     </Container>

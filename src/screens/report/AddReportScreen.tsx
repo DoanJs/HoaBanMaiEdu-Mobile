@@ -61,7 +61,6 @@ const AddReportScreen = ({ navigation }: any) => {
     setAddReports(addReports);
   };
   const handleAddReport = async () => {
-    console.log(addReports)
     if (user && child) {
       setIsLoading(true);
       await addDocData({
@@ -152,11 +151,10 @@ const AddReportScreen = ({ navigation }: any) => {
           <TextComponent
             text={planSelected ? planSelected.title : 'Chọn kế hoạch tháng'}
             styles={{
-              backgroundColor: colors.green,
+              backgroundColor: colors.primary + '80',
               padding: 10,
               borderRadius: 10,
               textAlign: 'center',
-              fontFamily: fontFamillies.poppinsBold,
             }}
           />
         </TouchableOpacity>

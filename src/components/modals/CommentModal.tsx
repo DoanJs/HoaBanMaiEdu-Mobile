@@ -1,26 +1,31 @@
-import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { InputComponent } from '..';
 import { colors } from '../../constants/colors';
+import { useUserStore } from '../../zustand/store';
 
 interface Props {
-  visible: boolean
-  title: string
-  setTitle: any
-  onClose: () => void
-  onChange: (val: string) => void
-  handleAddEditPlan: () => void
+  visible: boolean;
+  disable: boolean;
+  value: string;
+  comment: string;
+  onClose: () => void;
+  onChange: (val: string) => void;
+  handleSaveComment: () => void;
 }
 
-export default function TitlePlanModal(props: Props) {
-  const { visible, title, setTitle, onClose, onChange, handleAddEditPlan } = props
-
+export default function CommentModal(props: Props) {
+  const { user } = useUserStore();
+  const {
+    visible,
+    disable,
+    value,
+    comment,
+    onClose,
+    onChange,
+    handleSaveComment,
+  } = props;
 
   return (
     <Modal
@@ -32,7 +37,9 @@ export default function TitlePlanModal(props: Props) {
     >
       <View style={styles.modalBox}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Thêm tên kế hoạch</Text>
+          <Text style={styles.headerText}>
+            Góp ý từ cô {comment.split('@Js@')[0]}:{' '}
+          </Text>
           <TouchableOpacity onPress={onClose}>
             <Text style={styles.closeBtn}>Đóng</Text>
           </TouchableOpacity>
@@ -42,31 +49,54 @@ export default function TitlePlanModal(props: Props) {
           styles={{
             backgroundColor: colors.background,
             paddingVertical: 12,
-            paddingHorizontal: 26,
             borderRadius: 5,
           }}
-          placeholder='Tên kế hoạch'
+          editable={['Phó Giám đốc', 'Giám đốc'].includes(
+            user?.position as string,
+          )}
+          placeholder="Viết nhận xét"
           placeholderTextColor={colors.gray2}
           color={colors.background}
-          value={title}
+          value={value}
+          multible
+          numberOfLine={10}
           textStyles={{
             color: colors.text,
+            textAlignVertical: 'top',
+            minHeight: '40%',
           }}
-          onChange={val => {
-            onChange(val)
-            setTitle(val)
-          }}
+          onChange={val => onChange(val)}
         />
 
-        <View style={styles.actionRow}>
-          <TouchableOpacity onPress={onClose} style={[styles.button, styles.cancel]}>
-            <Text style={styles.buttonText}>Hủy</Text>
-          </TouchableOpacity>
+        {['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={[styles.button, styles.cancel]}
+            >
+              <Text style={styles.buttonText}>Hủy</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleAddEditPlan} style={[styles.button, styles.confirm]}>
-            <Text style={styles.buttonText}>Đồng ý</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              onPress={
+                disable
+                  ? () => {}
+                  : () => {
+                      handleSaveComment();
+                      onClose();
+                    }
+              }
+              style={[
+                styles.button,
+                {
+                  backgroundColor: disable ? colors.gray : colors.blue2,
+                },
+              ]}
+            >
+              <Text style={styles.buttonText}>Gửi</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </Modal>
   );
@@ -144,16 +174,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginHorizontal: 5,
     borderRadius: 8,
-    alignItems: "center",
+    alignItems: 'center',
   },
   cancel: {
-    backgroundColor: "#ccc",
+    backgroundColor: '#ccc',
   },
   confirm: {
-    backgroundColor: "#007bff",
+    backgroundColor: '#007bff',
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "600",
+    color: '#fff',
+    fontWeight: '600',
   },
 });

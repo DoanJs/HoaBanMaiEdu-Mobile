@@ -1,7 +1,18 @@
-import { collection, getDocs, query, serverTimestamp, where } from '@react-native-firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query,
+  serverTimestamp,
+  where,
+} from '@react-native-firebase/firestore';
 import { AddCircle, Profile2User } from 'iconsax-react-native';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  TouchableOpacity,
+} from 'react-native';
 import { db } from '../../../firebase.config';
 import {
   ButtonComponent,
@@ -12,34 +23,42 @@ import {
   SectionComponent,
   SpaceComponent,
   SpinnerComponent,
-  TextComponent
+  TextComponent,
 } from '../../components';
 import { TitlePlanModal } from '../../components/modals';
 import { colors } from '../../constants/colors';
 import { addDocData } from '../../constants/firebase/addDocData';
 import { deleteDocData } from '../../constants/firebase/deleteDocData';
 import { getDocData } from '../../constants/firebase/getDocData';
+import { getDocsData } from '../../constants/firebase/getDocsData';
 import { updateDocData } from '../../constants/firebase/updateDocData';
 import { fontFamillies } from '../../constants/fontFamilies';
+import { groupArrayWithField } from '../../constants/groupArrayWithField';
 import { sizes } from '../../constants/sizes';
 import { PlanModel } from '../../models';
-import { useCartEditStore, useCartStore, useChildStore, usePlanStore, useUserStore } from '../../zustand/store';
-import { groupArrayWithField } from '../../constants/groupArrayWithField';
+import {
+  useCartEditStore,
+  useCartStore,
+  useChildStore,
+  usePlanStore,
+  useUserStore,
+} from '../../zustand/store';
 
 const CartScreen = ({ navigation }: any) => {
-  const { user } = useUserStore()
+  const { user } = useUserStore();
   const { carts, setCarts } = useCartStore();
   const { child } = useChildStore();
-  const { addPlan, editPlan, plans } = usePlanStore()
+  const { addPlan, editPlan, plans } = usePlanStore();
   const { cartEdit, setCartEdit } = useCartEditStore();
   const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isVisibleTitlePlan, setIsVisibleTitlePlan] = useState(false);
   const [plan, setPlan] = useState<PlanModel>();
+  const [refreshing, setRefreshing] = useState(false); // loading khi kéo xuống
 
   useEffect(() => {
     if (cartEdit) {
-      getDocData({ id: cartEdit, nameCollect: "plans", setData: setPlan });
+      getDocData({ id: cartEdit, nameCollect: 'plans', setData: setPlan });
     }
   }, [cartEdit]);
   useEffect(() => {
@@ -53,41 +72,41 @@ const CartScreen = ({ navigation }: any) => {
       setIsLoading(true);
       if (!cartEdit) {
         await addDocData({
-          nameCollect: "plans",
+          nameCollect: 'plans',
           value: {
-            type: "KH",
+            type: 'KH',
             title,
             childId: child.id,
             teacherIds: child.teacherIds,
             authorId: user.id,
-            status: "pending",
-            comment: "",
+            status: 'pending',
+            comment: '',
 
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),
           },
-          metaDoc: "plans",
+          metaDoc: 'plans',
         })
-          .then(async (result) => {
+          .then(async result => {
             addPlan({
               id: result.id,
-              type: "KH",
+              type: 'KH',
               title,
               childId: child.id,
               teacherIds: child.teacherIds,
               authorId: user.id,
-              status: "pending",
-              comment: "",
+              status: 'pending',
+              comment: '',
 
               createAt: serverTimestamp(),
               updateAt: serverTimestamp(),
             });
-            const promiseItems = carts.map((cart) =>
+            const promiseItems = carts.map(cart =>
               addDocData({
-                nameCollect: "planTasks",
+                nameCollect: 'planTasks',
                 value: {
-                  content: cart.content ?? "",
-                  intervention: cart.intervention ?? "",
+                  content: cart.content ?? '',
+                  intervention: cart.intervention ?? '',
                   teacherIds: child.teacherIds,
                   authorId: user.id,
                   planId: result.id,
@@ -97,112 +116,133 @@ const CartScreen = ({ navigation }: any) => {
                   createAt: serverTimestamp(),
                   updateAt: serverTimestamp(),
                 },
-                metaDoc: "plans",
-              })
+                metaDoc: 'plans',
+              }),
             );
 
             await Promise.all(promiseItems);
             setIsLoading(false);
             setCarts([]);
-            setTitle("");
+            setTitle('');
 
             // xóa hết cart cũ khi đã thêm thành công
-            const promiseCartItems = carts.map((cart) =>
+            const promiseCartItems = carts.map(cart =>
               deleteDocData({
-                nameCollect: "carts",
+                nameCollect: 'carts',
                 id: cart.id,
-                metaDoc: "carts",
-              })
+                metaDoc: 'carts',
+              }),
             );
             await Promise.all(promiseCartItems);
           })
-          .catch((error) => {
+          .catch(error => {
             setIsLoading(false);
             console.log(error);
           });
       } else {
         updateDocData({
-          nameCollect: "plans",
+          nameCollect: 'plans',
           id: cartEdit,
           valueUpdate: {
             title,
           },
-          metaDoc: "plans",
+          metaDoc: 'plans',
         })
           .then(() => {
-            const index = plans.findIndex((_) => _.id === cartEdit);
+            const index = plans.findIndex(_ => _.id === cartEdit);
             if (index !== -1) {
               editPlan(cartEdit, { ...plans[index], title });
             }
           })
-          .catch((error) => {
+          .catch(error => {
             console.log(error);
           });
 
         // xoa het cai cu
         const snapShot = await getDocs(
           query(
-            collection(db, "planTasks"),
-            where("teacherIds", "array-contains", user.id),
-            where("planId", "==", cartEdit)
-          )
+            collection(db, 'planTasks'),
+            where('teacherIds', 'array-contains', user.id),
+            where('planId', '==', cartEdit),
+          ),
         );
         if (!snapShot.empty) {
           const promisePlanTasksOld = snapShot.docs.map((_: any) =>
             deleteDocData({
-              nameCollect: "planTasks",
+              nameCollect: 'planTasks',
               id: _.id,
-              metaDoc: "plans",
-            })
+              metaDoc: 'plans',
+            }),
           );
           await Promise.all(promisePlanTasksOld);
         }
 
         // tao lai cai moi
-        const promisePlanTasksNew = carts.map((cart) =>
+        const promisePlanTasksNew = carts.map(cart =>
           addDocData({
-            nameCollect: "planTasks",
+            nameCollect: 'planTasks',
             value: {
               childId: child.id,
               planId: cartEdit,
               targetId: cart.targetId,
               teacherIds: child.teacherIds,
               authorId: user.id,
-              content: cart.content ?? "",
-              intervention: cart.intervention ?? "",
+              content: cart.content ?? '',
+              intervention: cart.intervention ?? '',
 
               createAt: serverTimestamp(),
               updateAt: serverTimestamp(),
             },
-            metaDoc: "plans",
-          })
+            metaDoc: 'plans',
+          }),
         );
 
         await Promise.all(promisePlanTasksNew);
         setIsLoading(false);
         setCartEdit(null);
         setCarts([]);
-        setTitle("");
+        setTitle('');
       }
-      navigation.navigate('Pending')
+      navigation.navigate('Pending');
     }
   };
   const handleSaveCart = () => {
-    setIsLoading(true)
-    const promiseItems = carts.map((cart) => updateDocData({
-      nameCollect: 'carts',
-      id: cart.id,
-      valueUpdate: cart,
-      metaDoc: 'carts'
-    }))
+    setIsLoading(true);
+    const promiseItems = carts.map(cart =>
+      updateDocData({
+        nameCollect: 'carts',
+        id: cart.id,
+        valueUpdate: cart,
+        metaDoc: 'carts',
+      }),
+    );
 
-    Promise.all(promiseItems).then(() => {
-      setIsLoading(false)
-    }).catch(error => {
-      setIsLoading(false)
-      console.log(error)
-    })
-  }
+    Promise.all(promiseItems)
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch(error => {
+        setIsLoading(false);
+        console.log(error);
+      });
+  };
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      getDocsData({
+        nameCollect: 'carts',
+        condition: [
+          where('teacherIds', 'array-contains', user?.id),
+          where('childId', '==', child?.id),
+        ],
+        setData: setCarts,
+      });
+      setTitle('');
+      setCartEdit(null);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   if (!child) return <ActivityIndicator />;
   return (
@@ -226,100 +266,109 @@ const CartScreen = ({ navigation }: any) => {
           paddingVertical: 10,
         }}
       >
-        {
-          carts.length > 0 ?
-            <>
-              <RowComponent>
-                <InputComponent
-                  styles={{
-                    backgroundColor: colors.background,
-                    borderRadius: 5,
-                    flex: 1
-                  }}
-                  allowClear
-                  placeholder="Tên kế hoạch: "
-                  placeholderTextColor={colors.text}
-                  color={colors.gray}
-                  value={title}
-                  onChange={val => setTitle(val)}
-                />
-                <SpaceComponent width={20} />
-                <AddCircle
-                  onPress={() => navigation.navigate('Target')}
-                  size={sizes.title}
-                  color={colors.primary}
-                  variant="Bold"
-                />
-              </RowComponent>
+        {carts.length > 0 ? (
+          <>
+            <RowComponent>
+              <InputComponent
+                styles={{
+                  backgroundColor: colors.background,
+                  borderRadius: 5,
+                  flex: 1,
+                }}
+                allowClear
+                placeholder="Tên kế hoạch: "
+                placeholderTextColor={colors.text}
+                color={colors.gray}
+                value={title}
+                onChange={val => setTitle(val)}
+              />
+              <SpaceComponent width={20} />
+              <AddCircle
+                onPress={() => navigation.navigate('Target')}
+                size={sizes.title}
+                color={colors.primary}
+                variant="Bold"
+              />
+            </RowComponent>
 
-              <SpaceComponent height={10} />
+            <SpaceComponent height={10} />
 
-              <FlatList
-                showsVerticalScrollIndicator={false}
-                data={groupArrayWithField(carts, "fieldId")}
-                renderItem={({ item, index }) =>
-                  <CartItemComponent
-                    key={item.id}
-                    index={index}
-                    cart={item}
-                  />}
-                ListFooterComponent={
-                  carts.length > 0 && title !== '' ?
-                    <RowComponent justify="space-around">
-                      {
-                        !cartEdit &&
-                        <>
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={groupArrayWithField(carts, 'fieldId')}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              renderItem={({ item, index }) => (
+                <CartItemComponent key={item.id} index={index} cart={item} />
+              )}
+              ListFooterComponent={
+                carts.length > 0 ? (
+                  <RowComponent justify="space-around">
+                    {title === '' ? (
+                      <>
+                        <ButtonComponent
+                          color="coral"
+                          text="Lưu nháp"
+                          onPress={handleSaveCart}
+                          styles={{ flex: 1 }}
+                        />
+                        <SpaceComponent width={16} />
+                        <ButtonComponent
+                          color={colors.green}
+                          text={'Gửi duyệt'}
+                          onPress={() => setIsVisibleTitlePlan(true)}
+                          styles={{ flex: 1 }}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        {!cartEdit && (
                           <ButtonComponent
                             color="coral"
                             text="Lưu nháp"
                             onPress={handleSaveCart}
                             styles={{ flex: 1 }}
                           />
-                          <SpaceComponent width={16} />
-                        </>
-                      }
-                      <ButtonComponent
-                        color={cartEdit ? colors.blue : colors.green}
-                        textStyles={{ color: cartEdit ? colors.background : colors.text }}
-                        text={cartEdit ? 'Lưu' : "Gửi duyệt"}
-                        onPress={handleAddEditPlan}
-                        styles={{ flex: 1 }}
-                      />
-                    </RowComponent>
-                    :
-                    <RowComponent justify="space-around">
-                      <ButtonComponent
-                        color="coral"
-                        text="Lưu nháp"
-                        onPress={() => setIsVisibleTitlePlan(true)}
-                        styles={{ flex: 1 }}
-                      />
-                      <SpaceComponent width={16} />
-                      <ButtonComponent
-                        color={colors.green}
-                        text={"Gửi duyệt"}
-                        onPress={() => setIsVisibleTitlePlan(true)}
-                        styles={{ flex: 1 }}
-                      />
-                    </RowComponent>
-                }
-              />
-            </>
-            :
-            <RowComponent justify='center'>
-              <TextComponent text='Giỏ mục tiêu trống !' font={fontFamillies.poppinsBold} />
-              <SpaceComponent width={10} />
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Target')}
-                style={{
-                  backgroundColor: colors.green,
-                  padding: 10,
-                  borderRadius: 10
-                }}>
-                <TextComponent text='Tạo kế hoạch mới' />
-              </TouchableOpacity>
-            </RowComponent>
-        }
+                        )}
+                        <SpaceComponent width={16} />
+                        <ButtonComponent
+                          color={cartEdit ? colors.blue : colors.green}
+                          textStyles={{
+                            color: cartEdit ? colors.background : colors.text,
+                          }}
+                          text={cartEdit ? 'Lưu' : 'Gửi duyệt'}
+                          onPress={handleAddEditPlan}
+                          styles={{ flex: 1 }}
+                        />
+                      </>
+                    )}
+                  </RowComponent>
+                ) : (
+                  <></>
+                )
+              }
+            />
+          </>
+        ) : (
+          <RowComponent justify="center">
+            <TextComponent
+              text="Giỏ mục tiêu trống !"
+              font={fontFamillies.poppinsBold}
+            />
+            <SpaceComponent width={10} />
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Target')}
+              style={{
+                backgroundColor: colors.green,
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              <TextComponent text="Tạo kế hoạch mới" />
+            </TouchableOpacity>
+          </RowComponent>
+        )}
       </SectionComponent>
 
       <SpinnerComponent loading={isLoading} />
@@ -327,7 +376,7 @@ const CartScreen = ({ navigation }: any) => {
         visible={isVisibleTitlePlan}
         title={title}
         setTitle={setTitle}
-        onChange={(val) => setTitle(val)}
+        onChange={val => setTitle(val)}
         onClose={() => setIsVisibleTitlePlan(false)}
         handleAddEditPlan={handleAddEditPlan}
       />

@@ -3,8 +3,8 @@ import {
   Profile2User,
   TickCircle,
 } from 'iconsax-react-native';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
 import {
   Container,
   RowComponent,
@@ -26,15 +26,17 @@ import {
   useChildStore,
   useTargetStore,
 } from '../../zustand/store';
+import { getDocsData } from '../../constants/firebase/getDocsData';
 
 const TargetDetailScreen = ({ navigation, route }: any) => {
   const { field } = route.params;
   const { child } = useChildStore();
-  const { targets } = useTargetStore();
+  const { targets, setTargets } = useTargetStore();
   const { carts, setCarts } = useCartStore();
   const [targetsField, setTargetsField] = useState<TargetModel[]>([]);
   const [targetsNew, setTargetsNew] = useState<TargetModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+    const [refreshing, setRefreshing] = useState(false); // loading khi kéo xuống
 
   useEffect(() => {
     if (targets) {
@@ -64,6 +66,17 @@ const TargetDetailScreen = ({ navigation, route }: any) => {
     await Promise.all(promiseItems);
     setIsLoading(false);
   };
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      getDocsData({
+        nameCollect: 'targets',
+        setData: setTargets,
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   if (!child) return <ActivityIndicator />;
   return (
@@ -149,6 +162,9 @@ const TargetDetailScreen = ({ navigation, route }: any) => {
 
         <FlatList
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           data={targetsNew.sort((a, b) => a.level - b.level)}
           renderItem={({ item }) => (
             <TargetItemComponent

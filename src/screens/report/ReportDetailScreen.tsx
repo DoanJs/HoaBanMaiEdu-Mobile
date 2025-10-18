@@ -1,48 +1,75 @@
-import { doc, getDoc, serverTimestamp, where } from '@react-native-firebase/firestore'
-import { DocumentDownload, Profile2User, Trash } from 'iconsax-react-native'
-import moment from 'moment'
-import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList } from 'react-native'
-import Entypo from 'react-native-vector-icons/Entypo'
-import { db } from '../../../firebase.config'
-import { Container, RowComponent, SectionComponent, SpinnerComponent, TextComponent } from '../../components'
-import { DeleteModal } from '../../components/modals'
-import { colors } from '../../constants/colors'
-import { convertTargetField } from '../../constants/convertTargetAndField'
-import { convertTimeStampFirestore } from '../../constants/convertTimeStampFirestore'
-import { getDocsData } from '../../constants/firebase/getDocsData'
-import { updateDocData } from '../../constants/firebase/updateDocData'
-import { fontFamillies } from '../../constants/fontFamilies'
-import { groupArrayWithField } from '../../constants/groupArrayWithField'
-import { sizes } from '../../constants/sizes'
-import { PlanTaskModel, ReportTaskModel } from '../../models'
-import { useChildStore, useFieldStore, useTargetStore, useUserStore } from '../../zustand/store'
-import ReportItemComponent from './ReportItemComponent'
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  where,
+} from '@react-native-firebase/firestore';
+import {
+  DocumentDownload,
+  MessageAdd,
+  MessageNotif,
+  Profile2User,
+  Trash,
+} from 'iconsax-react-native';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList } from 'react-native';
+import Entypo from 'react-native-vector-icons/Entypo';
+import { db } from '../../../firebase.config';
+import {
+  Container,
+  RowComponent,
+  SectionComponent,
+  SpinnerComponent,
+  TextComponent,
+} from '../../components';
+import { CommentModal, DeleteModal } from '../../components/modals';
+import { colors } from '../../constants/colors';
+import { convertTargetField } from '../../constants/convertTargetAndField';
+import { convertTimeStampFirestore } from '../../constants/convertTimeStampFirestore';
+import { getDocsData } from '../../constants/firebase/getDocsData';
+import { updateDocData } from '../../constants/firebase/updateDocData';
+import { fontFamillies } from '../../constants/fontFamilies';
+import { groupArrayWithField } from '../../constants/groupArrayWithField';
+import { sizes } from '../../constants/sizes';
+import { PlanTaskModel, ReportTaskModel } from '../../models';
+import {
+  useChildStore,
+  useFieldStore,
+  useReportStore,
+  useTargetStore,
+  useUserStore,
+} from '../../zustand/store';
+import ReportItemComponent from './ReportItemComponent';
 
 const ReportDetailScreen = ({ navigation, route }: any) => {
-  const { report } = route.params
-  const { child } = useChildStore()
-  const { user } = useUserStore()
+  const { report } = route.params;
+  const { child } = useChildStore();
+  const { user } = useUserStore();
   const [disable, setDisable] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const { targets } = useTargetStore();
   const { fields } = useFieldStore();
+  const { reports, editReport } = useReportStore();
+  const [isComment, setIsComment] = useState(false);
+  const [text, setText] = useState('');
   const [reportTasks, setReportTasks] = useState<ReportTaskModel[]>([]);
   const [planTasks, setPlanTasks] = useState<PlanTaskModel[]>([]);
   const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState(false);
+  const [isVisibleCommentModal, setIsVisibleCommentModal] = useState(false);
 
   // Lấy trực tiếp từ firebase
   useEffect(() => {
     if (report) {
-      // if (comment) {
-      //   setIsComment(true);
-      //   setText(comment.split("@Js@")[1]);
-      // }
+      if (report.comment) {
+        setIsComment(true);
+        setText(report.comment.split('@Js@')[1]);
+      }
       getDocsData({
-        nameCollect: "reportTasks",
+        nameCollect: 'reportTasks',
         condition: [
-          where("teacherIds", "array-contains", user?.id),
-          where("reportId", "==", report.id),
+          where('teacherIds', 'array-contains', user?.id),
+          where('reportId', '==', report.id),
         ],
         setData: setReportTasks,
       });
@@ -54,23 +81,30 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
       getPlanTasks(reportTasks);
     }
   }, [reportTasks]);
-
+  useEffect(() => {
+    if (text !== report.comment?.split('@Js@')[1]) {
+      setDisable(false);
+    } else {
+      setDisable(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text]);
 
   const handleSaveReportTask = async () => {
     // luu phia firestore
     if (!disable) {
       try {
         setIsLoading(true);
-        const promiseItems = reportTasks.map((_) =>
+        const promiseItems = reportTasks.map(_ =>
           updateDocData({
-            nameCollect: "reportTasks",
+            nameCollect: 'reportTasks',
             id: _.id,
             valueUpdate: {
               content: _.content,
               updateAt: serverTimestamp(),
             },
-            metaDoc: "reports",
-          })
+            metaDoc: 'reports',
+          }),
         );
         await Promise.all(promiseItems);
         setIsLoading(false);
@@ -82,14 +116,14 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
     }
   };
   const getPlanTask = (planTaskId: string, planTasks: PlanTaskModel[]) => {
-    const index = planTasks.findIndex((planTask) => planTask.id === planTaskId);
+    const index = planTasks.findIndex(planTask => planTask.id === planTaskId);
     if (index !== -1) {
       return planTasks[index];
     }
   };
   const getPlanTasks = async (reportTasks: ReportTaskModel[]) => {
-    const promiseItems = reportTasks.map(async (reportTask) => {
-      const docSnap = await getDoc(doc(db, "planTasks", reportTask.planTaskId));
+    const promiseItems = reportTasks.map(async reportTask => {
+      const docSnap = await getDoc(doc(db, 'planTasks', reportTask.planTaskId));
       return {
         ...docSnap.data(),
         id: docSnap.id,
@@ -101,21 +135,39 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
   };
   const handleGroupReportWithField = (reportTasks: ReportTaskModel[]) => {
     return groupArrayWithField(
-      reportTasks.map((reportTask) => {
+      reportTasks.map(reportTask => {
         return {
           ...reportTask,
           fieldId: convertTargetField(
             getPlanTask(reportTask.planTaskId, planTasks)?.targetId as string,
             targets,
-            fields
+            fields,
           ).fieldId,
         };
       }),
-      "fieldId"
+      'fieldId',
     );
   };
+  const handleSaveComment = async () => {
+    setIsLoading(true);
+    const indexReport = reports.findIndex(_ => _.id === report.id);
+    editReport(report.id, {
+      ...reports[indexReport],
+      comment: text ? `${user?.fullName}@Js@${text}` : '',
+    });
+    await updateDocData({
+      nameCollect: 'reports',
+      id: report.id,
+      metaDoc: 'reports',
+      valueUpdate: {
+        comment: text !== '' ? `${user?.fullName}@Js@${text}` : '',
+      },
+    });
+    setIsLoading(false);
+    setDisable(true);
+  };
 
-  if (!child) return <ActivityIndicator />
+  if (!child) return <ActivityIndicator />;
   return (
     <Container
       back
@@ -137,25 +189,43 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
           paddingVertical: 10,
         }}
       >
-        <RowComponent justify='space-between'>
+        <RowComponent justify="space-between">
           <TextComponent text={report.title} font={fontFamillies.poppinsBold} />
+          {isComment && report.status === 'pending' && (
+            <MessageNotif
+              size={sizes.title}
+              color={colors.red}
+              variant="Bold"
+              onPress={() => setIsVisibleCommentModal(true)}
+            />
+          )}
+          {!isComment && report.status === 'pending' &&
+            ['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
+              <MessageAdd
+                size={sizes.title}
+                color={colors.green}
+                variant="Bold"
+                onPress={() => setIsVisibleCommentModal(true)}
+              />
+            )}
           {convertTimeStampFirestore(report?.createAt) !==
-            convertTimeStampFirestore(report?.updateAt) ? (
+          convertTimeStampFirestore(report?.updateAt) ? (
             <TextComponent
-              styles={{ fontStyle: "italic" }}
+              styles={{ fontStyle: 'italic' }}
               text={`Cập nhật: ${moment(
-                convertTimeStampFirestore(report?.updateAt)
-              ).format("HH:mm:ss DD/MM/YYYY")}`}
+                convertTimeStampFirestore(report?.updateAt),
+              ).format('HH:mm:ss DD/MM/YYYY')}`}
               size={sizes.smallText}
             />
-          ) :
+          ) : (
             <TextComponent
-              styles={{ fontStyle: "italic" }}
+              styles={{ fontStyle: 'italic' }}
               text={`Gửi lên: ${moment(
-                convertTimeStampFirestore(report?.createAt)
-              ).format("HH:mm:ss_DD/MM/YYYY")}`}
+                convertTimeStampFirestore(report?.createAt),
+              ).format('HH:mm:ss_DD/MM/YYYY')}`}
               size={sizes.smallText}
-            />}
+            />
+          )}
           <TextComponent
             text={report.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
             size={sizes.smallText}
@@ -165,7 +235,7 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
         <FlatList
           showsVerticalScrollIndicator={false}
           data={handleGroupReportWithField(reportTasks)}
-          renderItem={({ item, index }) =>
+          renderItem={({ item, index }) => (
             <ReportItemComponent
               key={index}
               index={index}
@@ -173,16 +243,20 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
               reportTasks={reportTasks}
               onSetReportTasks={setReportTasks}
               setDisable={setDisable}
-              onChange={() => { }}
-            />}
+              onChange={() => {}}
+            />
+          )}
           ListFooterComponent={
-            <RowComponent justify="space-around" styles={{ paddingVertical: 10 }}>
+            <RowComponent
+              justify="space-around"
+              styles={{ paddingVertical: 10 }}
+            >
               {report.status === 'approved' && (
                 <DocumentDownload
                   variant="Bold"
                   size={sizes.extraTitle}
                   color={colors.blue}
-                  onPress={() => { }}
+                  onPress={() => {}}
                 />
               )}
               {report.status === 'pending' && (
@@ -191,9 +265,11 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
                     name="save"
                     size={sizes.extraTitle}
                     color={disable ? colors.gray2 : colors.blue}
-                    onPress={disable ? () => { } : handleSaveReportTask}
+                    onPress={disable ? () => {} : handleSaveReportTask}
                   />
-                  <Trash variant="Bold" size={sizes.extraTitle}
+                  <Trash
+                    variant="Bold"
+                    size={sizes.extraTitle}
                     color={colors.red}
                     onPress={() => setIsVisibleDeleteModal(true)}
                   />
@@ -204,17 +280,27 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
         />
       </SectionComponent>
 
-      <DeleteModal data={{
-        id: report.id,
-        type: 'reportPending',
-        itemTasks: reportTasks
-      }}
+      <DeleteModal
+        data={{
+          id: report.id,
+          type: 'reportPending',
+          itemTasks: reportTasks,
+        }}
         visible={isVisibleDeleteModal}
         onClose={() => setIsVisibleDeleteModal(false)}
       />
+      <CommentModal
+        visible={isVisibleCommentModal}
+        disable={disable}
+        onClose={() => setIsVisibleCommentModal(false)}
+        value={text}
+        comment={report.comment}
+        onChange={val => setText(val)}
+        handleSaveComment={handleSaveComment}
+      />
       <SpinnerComponent loading={isLoading} />
     </Container>
-  )
-}
+  );
+};
 
-export default ReportDetailScreen
+export default ReportDetailScreen;

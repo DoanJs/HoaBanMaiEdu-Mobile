@@ -1,6 +1,7 @@
+import { where } from '@react-native-firebase/firestore';
 import { AddCircle, Profile2User } from 'iconsax-react-native';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, RefreshControl, ScrollView, TouchableOpacity } from 'react-native';
 import {
   Container,
   RowComponent,
@@ -10,21 +11,37 @@ import {
   TextComponent,
 } from '../../components';
 import { colors } from '../../constants/colors';
+import { getDocsData } from '../../constants/firebase/getDocsData';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { sizes } from '../../constants/sizes';
 import { PlanModel } from '../../models';
-import { useChildStore, usePlanStore } from '../../zustand/store';
+import { useChildStore, usePlanStore, useUserStore } from '../../zustand/store';
 
 const PlanScreen = ({ navigation }: any) => {
   const { child } = useChildStore();
-  const { plans } = usePlanStore();
+  const { user } = useUserStore();
+  const { plans, setPlans } = usePlanStore();
   const [plansApproved, setPlansApproved] = useState<PlanModel[]>([]);
+  const [refreshing, setRefreshing] = useState(false); // loading khi kéo xuống
 
   useEffect(() => {
     if (plans.length > 0) {
       setPlansApproved(plans.filter(plan => plan.status === 'approved'));
     }
   }, [plans]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      getDocsData({
+        nameCollect: 'plans',
+        condition: [where('teacherIds', 'array-contains', user?.id)],
+        setData: setPlans,
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   if (!child) return <ActivityIndicator />;
   return (
@@ -64,7 +81,12 @@ const PlanScreen = ({ navigation }: any) => {
             variant="Bold"
           />
         </RowComponent>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <SpaceComponent height={6} />
           <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
             {plansApproved.map((_, index) => (
