@@ -102,12 +102,12 @@ const TargetItemComponent = (props: Props) => {
       onPress={handleSelected}
       style={{
         borderWidth: 1,
-        borderColor: colors.primary + '80',
+        borderColor: colors.primary + '66',
         borderRadius: 10,
         padding: 10,
         marginBottom: 8,
         backgroundColor: showSelected()
-          ? colors.primary + '80'
+          ? colors.primary + '66'
           : colors.background,
       }}
     >

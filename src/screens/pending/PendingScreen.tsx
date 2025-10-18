@@ -1,7 +1,13 @@
 import { where } from '@react-native-firebase/firestore';
-import { Profile2User } from 'iconsax-react-native';
+import { MessageNotif, Profile2User } from 'iconsax-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {
   Container,
   RowComponent,
@@ -132,15 +138,15 @@ const PendingScreen = ({ navigation }: any) => {
               : reports.filter(report => report.status === 'pending')
           }
           onChange={
-            selected === 'Kế hoạch' ? val => setPlanNews(val) : () => {}
+            selected === 'Kế hoạch'
+              ? val => setPlanNews(val)
+              : val => setReportNews(val)
           }
           placeholder={`Nhập ${
             selected === 'Kế hoạch' ? 'kế hoạch' : 'báo cáo'
           }`}
-          type="searchPlan"
+          type={selected === 'Kế hoạch' ? 'searchPlan' : 'searchReport'}
         />
-
-        <SpaceComponent height={10} />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -148,7 +154,10 @@ const PendingScreen = ({ navigation }: any) => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
+          <RowComponent
+            justify="space-around"
+            styles={{ flexWrap: 'wrap', paddingTop: 10 }}
+          >
             {selected === 'Kế hoạch'
               ? planNews.map((_, index) => (
                   <TouchableOpacity
@@ -165,12 +174,28 @@ const PendingScreen = ({ navigation }: any) => {
                       borderRadius: 100,
                       marginBottom: 10,
                       marginLeft: 10,
+                      position: 'relative',
                     }}
                   >
                     <TextComponent
                       text={_.title}
                       font={fontFamillies.poppinsBold}
                     />
+                    {_.comment && (
+                      <View
+                        style={{
+                          position: 'absolute',
+                          top: -10,
+                          right: 0,
+                        }}
+                      >
+                        <MessageNotif
+                          color={colors.red}
+                          size={sizes.title}
+                          variant="Bold"
+                        />
+                      </View>
+                    )}
                   </TouchableOpacity>
                 ))
               : reportNews.map((_, index) => (
@@ -188,12 +213,28 @@ const PendingScreen = ({ navigation }: any) => {
                       borderRadius: 100,
                       marginBottom: 10,
                       marginLeft: 10,
+                      position: 'relative',
                     }}
                   >
                     <TextComponent
                       text={_.title}
                       font={fontFamillies.poppinsBold}
                     />
+                    {_.comment && (
+                      <View
+                        style={{
+                          position: 'absolute',
+                          top: -10,
+                          right: 0,
+                        }}
+                      >
+                        <MessageNotif
+                          color={colors.red}
+                          size={sizes.title}
+                          variant="Bold"
+                        />
+                      </View>
+                    )}
                   </TouchableOpacity>
                 ))}
           </RowComponent>

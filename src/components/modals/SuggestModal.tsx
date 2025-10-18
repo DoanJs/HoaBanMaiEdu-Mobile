@@ -7,48 +7,58 @@ import {
   View,
 } from 'react-native';
 import Modal from 'react-native-modal';
+import { SearchComponent, SpaceComponent } from '..';
 import { colors } from '../../constants/colors';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { useSuggestStore } from '../../zustand/store';
 
 interface Props {
-  visible: boolean
-  onClose: () => void
-  cart: any
-  content: string
-  onChange: (val: string) => void
+  visible: boolean;
+  onClose: () => void;
+  cart: any;
+  content: string;
+  onChange: (val: string) => void;
 }
 
 export default function SuggestModal(props: Props) {
-  const { visible, onClose, cart, content, onChange } = props
-  const { suggests } = useSuggestStore()
+  const { visible, onClose, cart, content, onChange } = props;
+  const { suggests } = useSuggestStore();
   const [suggestNews, setSuggestNews] = useState<any[]>([]);
   const [selected, setSelected] = useState('');
 
   useEffect(() => {
     if (suggests.length > 0 && cart) {
-      setSuggestNews(suggests.filter((suggest) => suggest.fieldId === cart.fieldId));
+      setSuggestNews(
+        suggests.filter(suggest => suggest.fieldId === cart.fieldId),
+      );
     }
   }, [suggests, cart]);
   useEffect(() => {
     if (content) {
-      setSelected(content)
+      setSelected(content);
     }
-  }, [content])
+  }, [content]);
 
   const renderItem = ({ item }: any) => (
-    <TouchableOpacity style={styles.item}
+    <TouchableOpacity
+      style={styles.item}
       onPress={() => {
-        setSelected(item.name)
-        onChange(item.name)
+        setSelected(item.name);
+        onChange(item.name);
       }}
-
     >
-      <Text style={[styles.itemContent,
-      {
-        color: selected === item.name ? colors.green : '#333',
-        fontFamily: selected === item.name ? fontFamillies.poppinsBold : fontFamillies.poppinsRegular
-      }]}>
+      <Text
+        style={[
+          styles.itemContent,
+          {
+            color: selected === item.name ? colors.green : '#333',
+            fontFamily:
+              selected === item.name
+                ? fontFamillies.poppinsBold
+                : fontFamillies.poppinsRegular,
+          },
+        ]}
+      >
         {item.name}
       </Text>
     </TouchableOpacity>
@@ -70,10 +80,20 @@ export default function SuggestModal(props: Props) {
           </TouchableOpacity>
         </View>
 
+        <SearchComponent
+          arrSource={suggests.filter(
+            suggest => suggest.fieldId === cart.fieldId,
+          )}
+          onChange={val => setSuggestNews(val)}
+          placeholder="Nhập gợi ý"
+          type="searchSuggest"
+        />
+
+        <SpaceComponent height={10} />
         <FlatList
           data={suggestNews}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
         />
       </View>

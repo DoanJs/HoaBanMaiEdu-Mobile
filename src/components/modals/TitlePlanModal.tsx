@@ -63,7 +63,10 @@ export default function TitlePlanModal(props: Props) {
             <Text style={styles.buttonText}>Hủy</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleAddEditPlan} style={[styles.button, styles.confirm]}>
+          <TouchableOpacity onPress={() => {
+            handleAddEditPlan()
+            onClose()
+          }} style={[styles.button, styles.confirm]}>
             <Text style={styles.buttonText}>Đồng ý</Text>
           </TouchableOpacity>
         </View>
