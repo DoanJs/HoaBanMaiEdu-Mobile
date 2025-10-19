@@ -10,7 +10,7 @@ import {
 } from 'iconsax-react-native';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Linking } from 'react-native';
 import {
   Container,
   RowComponent,
@@ -27,6 +27,7 @@ import { updateDocData } from '../../constants/firebase/updateDocData';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { groupArrayWithField } from '../../constants/groupArrayWithField';
 import { sizes } from '../../constants/sizes';
+import { exportWord } from '../../exportFile/exportWord';
 import { PlanTaskModel } from '../../models';
 import {
   useCartEditStore,
@@ -134,22 +135,53 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
     editPlan(plan.id, { ...plans[indexPlan], status: 'approved' });
 
     setIsLoading(true);
-    updateDocData({
-      nameCollect: 'plans',
-      id: plan.id,
-      valueUpdate: { status: 'approved' },
-      metaDoc: 'plans',
+    // tạo url để tải về, lưu vào Firestore của mỗi plan
+    const items = hanldeGroupPlanWithField(planTasks).map(planTask => {
+      return {
+        field: convertTargetField(planTask.targetId, targets, fields).nameField,
+        target: convertTargetField(planTask.targetId, targets, fields)
+          .nameTarget,
+        intervention: planTask.intervention,
+        content: planTask.content,
+      };
+    });
+    exportWord({
+      rows: items,
+      title: plan.title.substring(2).trim(),
+      child: child?.fullName,
+      teacher: user?.fullName,
+      templateName: 'plan',
+      fileName: `${plan.title.replace('/', '_')}_${child?.fullName}`,
     })
-      .then(() => {
-        setIsLoading(false);
-        navigation.navigate('Main', { screen: 'Plan' });
+      .then(url => {
+        updateDocData({
+          nameCollect: 'plans',
+          id: plan.id,
+          valueUpdate: { status: 'approved', url },
+          metaDoc: 'plans',
+        })
+          .then(() => {
+            setIsLoading(false);
+            navigation.navigate('Main', { screen: 'Plan' });
+          })
+          .catch(error => {
+            setIsLoading(false);
+            console.log(error);
+          });
       })
       .catch(error => {
-        setIsLoading(false);
         console.log(error);
+        setIsLoading(false);
       });
   };
-
+  const openFile = async () => {
+    console.log(plan)
+    // if (plan && plan.url !== '') {
+    //   await Linking.openURL(plan.url);
+    // } else {
+    //   Alert.alert('Lỗi file không mở được hoặc chưa tồn tại !');
+    // }
+  };
   if (!child) return <ActivityIndicator />;
   return (
     <Container
@@ -183,7 +215,8 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
               onPress={() => setIsVisibleCommentModal(true)}
             />
           )}
-          {!isComment && plan.status === 'pending' &&
+          {!isComment &&
+            plan.status === 'pending' &&
             ['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
               <MessageAdd
                 size={sizes.title}
@@ -232,7 +265,7 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
                   variant="Bold"
                   size={sizes.extraTitle}
                   color={colors.blue}
-                  onPress={() => {}}
+                  onPress={openFile}
                 />
               )}
               {plan.status === 'pending' && (
