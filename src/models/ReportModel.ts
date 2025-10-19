@@ -11,6 +11,7 @@ export interface ReportModel {
   planId: string;
   status: string;
   comment: string;
+  url: string
 
   createAt: TimeAtModel | FieldValue;
   updateAt: TimeAtModel | FieldValue;

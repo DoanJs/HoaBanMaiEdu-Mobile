@@ -175,12 +175,11 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
       });
   };
   const openFile = async () => {
-    console.log(plan)
-    // if (plan && plan.url !== '') {
-    //   await Linking.openURL(plan.url);
-    // } else {
-    //   Alert.alert('Lỗi file không mở được hoặc chưa tồn tại !');
-    // }
+    try {
+      await Linking.openURL(plan.url);
+    } catch (error) {
+      Alert.alert('Lỗi file không mở được hoặc chưa tồn tại !');
+    }
   };
   if (!child) return <ActivityIndicator />;
   return (
@@ -260,7 +259,7 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
               justify="space-around"
               styles={{ paddingVertical: 16 }}
             >
-              {plan.status === 'approved' && (
+              {plan.status === 'approved' && plan.url !== '' && (
                 <DocumentDownload
                   variant="Bold"
                   size={sizes.extraTitle}

@@ -5,6 +5,7 @@ import {
   where,
 } from '@react-native-firebase/firestore';
 import {
+  ArchiveTick,
   DocumentDownload,
   MessageAdd,
   MessageNotif,
@@ -13,7 +14,7 @@ import {
 } from 'iconsax-react-native';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Linking } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { db } from '../../../firebase.config';
 import {
@@ -32,6 +33,7 @@ import { updateDocData } from '../../constants/firebase/updateDocData';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { groupArrayWithField } from '../../constants/groupArrayWithField';
 import { sizes } from '../../constants/sizes';
+import { exportWord } from '../../exportFile/exportWord';
 import { PlanTaskModel, ReportTaskModel } from '../../models';
 import {
   useChildStore,
@@ -166,6 +168,73 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
     setIsLoading(false);
     setDisable(true);
   };
+  const handleApproved = async () => {
+    const indexReport = reports.findIndex(_ => _.id === report.id);
+    editReport(report.id, { ...reports[indexReport], status: 'approved' });
+
+    setIsLoading(true);
+
+    const promiseItems = handleGroupReportWithField(reportTasks).map(
+      async reportTask => {
+        const docSnap = await getDoc(
+          doc(db, 'planTasks', reportTask.planTaskId),
+        );
+        if (docSnap.exists()) {
+          return {
+            intervention: docSnap.data()?.intervention,
+            content: docSnap.data()?.content,
+            field: convertTargetField(docSnap.data()?.targetId, targets, fields)
+              .nameField,
+            target: convertTargetField(
+              docSnap.data()?.targetId,
+              targets,
+              fields,
+            ).nameTarget,
+            total: reportTask.content,
+          };
+        } else {
+          console.log(`getDoc data error`);
+        }
+      },
+    );
+    const result = await Promise.all(promiseItems);
+
+    exportWord({
+      rows: result,
+      title: report.title.substring(2).trim(),
+      child: child?.fullName,
+      teacher: user?.fullName,
+      templateName: 'report',
+      fileName: `${report.title.replace('/', '_')}_${child?.fullName}`,
+    })
+      .then((url: string) => {
+        updateDocData({
+          nameCollect: 'reports',
+          id: report.id,
+          valueUpdate: { status: 'approved', url },
+          metaDoc: 'reports',
+        })
+          .then(() => {
+            setIsLoading(false);
+            navigation.navigate('Main', { screen: 'Report' });
+          })
+          .catch(error => {
+            setIsLoading(false);
+            console.log(error);
+          });
+      })
+      .catch(error => {
+        setIsLoading(false);
+        console.log(error);
+      });
+  };
+  const openFile = async () => {
+    try {
+      await Linking.openURL(report.url);
+    } catch (error) {
+      Alert.alert('Lỗi file không mở được hoặc chưa tồn tại !');
+    }
+  };
 
   if (!child) return <ActivityIndicator />;
   return (
@@ -199,7 +268,8 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
               onPress={() => setIsVisibleCommentModal(true)}
             />
           )}
-          {!isComment && report.status === 'pending' &&
+          {!isComment &&
+            report.status === 'pending' &&
             ['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
               <MessageAdd
                 size={sizes.title}
@@ -239,6 +309,7 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
             <ReportItemComponent
               key={index}
               index={index}
+              report={report}
               reportTask={item}
               reportTasks={reportTasks}
               onSetReportTasks={setReportTasks}
@@ -251,16 +322,24 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
               justify="space-around"
               styles={{ paddingVertical: 10 }}
             >
-              {report.status === 'approved' && (
+              {report.status === 'approved' && report.url !== '' && (
                 <DocumentDownload
                   variant="Bold"
                   size={sizes.extraTitle}
                   color={colors.blue}
-                  onPress={() => {}}
+                  onPress={openFile}
                 />
               )}
               {report.status === 'pending' && (
                 <>
+                  {user?.role === 'admin' && (
+                    <ArchiveTick
+                      variant="Bold"
+                      size={sizes.extraTitle}
+                      color={colors.green}
+                      onPress={handleApproved}
+                    />
+                  )}
                   <Entypo
                     name="save"
                     size={sizes.extraTitle}

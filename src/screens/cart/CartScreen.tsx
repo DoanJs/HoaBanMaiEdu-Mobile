@@ -82,6 +82,7 @@ const CartScreen = ({ navigation }: any) => {
             authorId: user.id,
             status: 'pending',
             comment: '',
+            url: '',
 
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),
@@ -98,6 +99,7 @@ const CartScreen = ({ navigation }: any) => {
               authorId: user.id,
               status: 'pending',
               comment: '',
+              url: '',
 
               createAt: serverTimestamp(),
               updateAt: serverTimestamp(),

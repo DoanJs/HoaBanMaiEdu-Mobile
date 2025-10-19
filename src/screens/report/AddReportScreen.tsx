@@ -73,6 +73,7 @@ const AddReportScreen = ({ navigation }: any) => {
           planId: planSelected?.id,
           status: 'pending',
           comment: '',
+          url: '',
 
           createAt: serverTimestamp(),
           updateAt: serverTimestamp(),
@@ -90,11 +91,12 @@ const AddReportScreen = ({ navigation }: any) => {
             planId: planSelected?.id as string,
             status: 'pending',
             comment: '',
+            url: '',
 
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),
           });
-          const promiseItems = addReports.map((_) =>
+          const promiseItems = addReports.map(_ =>
             addDocData({
               nameCollect: 'reportTasks',
               value: {
@@ -197,7 +199,7 @@ const AddReportScreen = ({ navigation }: any) => {
         onChange={val => setPlanSelected(val)}
         planSelected={planSelected}
       />
-      <SpinnerComponent loading={isLoading}/>
+      <SpinnerComponent loading={isLoading} />
     </Container>
   );
 };
