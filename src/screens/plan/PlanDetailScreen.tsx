@@ -8,9 +8,11 @@ import {
   Profile2User,
   Trash,
 } from 'iconsax-react-native';
+import Share from 'react-native-share';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Linking } from 'react-native';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {
   Container,
   RowComponent,
@@ -181,6 +183,18 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
       Alert.alert('Lỗi file không mở được hoặc chưa tồn tại !');
     }
   };
+  const shareFileLink = async () => {
+    try {
+      await Share.open({
+        title: 'Chia sẻ file kế hoạch',
+        message: 'Xem file kế hoạch này nhé:',
+        url: plan.url, // 🔹 chỉ là link, không phải file local
+      });
+    } catch (err) {
+      console.log('❌ Lỗi chia sẻ:', err);
+    }
+  };
+
   if (!child) return <ActivityIndicator />;
   return (
     <Container
@@ -260,12 +274,20 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
               styles={{ paddingVertical: 16 }}
             >
               {plan.status === 'approved' && plan.url !== '' && (
-                <DocumentDownload
-                  variant="Bold"
-                  size={sizes.extraTitle}
-                  color={colors.blue}
-                  onPress={openFile}
-                />
+                <>
+                  <DocumentDownload
+                    variant="Bold"
+                    size={sizes.extraTitle}
+                    color={colors.blue}
+                    onPress={openFile}
+                  />
+                  <FontAwesome5
+                    name="share-alt"
+                    size={sizes.bigTitle}
+                    color={colors.blue}
+                    onPress={shareFileLink}
+                  />
+                </>
               )}
               {plan.status === 'pending' && (
                 <>

@@ -13,14 +13,17 @@ import {
 } from '../../components';
 import { AddReportModal } from '../../components/modals';
 import { colors } from '../../constants/colors';
+import { convertTargetField } from '../../constants/convertTargetAndField';
 import { addDocData } from '../../constants/firebase/addDocData';
 import { getDocsData } from '../../constants/firebase/getDocsData';
-import { fontFamillies } from '../../constants/fontFamilies';
+import { groupArrayWithField } from '../../constants/groupArrayWithField';
 import { sizes } from '../../constants/sizes';
 import { PlanModel, PlanTaskModel } from '../../models';
 import {
   useChildStore,
+  useFieldStore,
   useReportStore,
+  useTargetStore,
   useUserStore,
 } from '../../zustand/store';
 import AddReportItemComponent from './AddReportItemComponent';
@@ -28,6 +31,8 @@ import AddReportItemComponent from './AddReportItemComponent';
 const AddReportScreen = ({ navigation }: any) => {
   const { child } = useChildStore();
   const { user } = useUserStore();
+  const { targets } = useTargetStore();
+  const { fields } = useFieldStore();
   const [isVisibleAddReport, setIsVisibleAddReport] = useState(false);
   const [planSelected, setPlanSelected] = useState<PlanModel>();
   const [planTasks, setPlanTasks] = useState<PlanTaskModel[]>([]);
@@ -125,7 +130,19 @@ const AddReportScreen = ({ navigation }: any) => {
       navigation.navigate('Main', { screen: 'Pending' });
     }
   };
+  const hanldeGroupPlanWithField = (addReports: any[]) => {
+    return groupArrayWithField(
+      addReports.map(_ => {
+        return {
+          ..._,
+          fieldId: convertTargetField(_.targetId, targets, fields).fieldId,
+        };
+      }),
+      'fieldId',
+    );
+  };
 
+  console.log(addReports);
   if (!child) return <ActivityIndicator />;
   return (
     <Container
@@ -165,7 +182,7 @@ const AddReportScreen = ({ navigation }: any) => {
         {planSelected && (
           <FlatList
             showsVerticalScrollIndicator={false}
-            data={addReports}
+            data={hanldeGroupPlanWithField(addReports)}
             renderItem={({ item, index }) => (
               <AddReportItemComponent
                 key={item.id}

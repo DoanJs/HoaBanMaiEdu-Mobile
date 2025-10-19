@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { auth, onAuthStateChanged } from './firebase.config';
 import { AuthNavigator, MainNavigator } from './src/router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -19,12 +20,14 @@ function App() {
   }, [isLoading]);
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NavigationContainer>
-        {isLoading ? <MainNavigator /> : <AuthNavigator />}
-      </NavigationContainer>
-    </View>
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <NavigationContainer>
+          {isLoading ? <MainNavigator /> : <AuthNavigator />}
+        </NavigationContainer>
+      </View>
+    </SafeAreaProvider>
   );
 }
 

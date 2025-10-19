@@ -15,7 +15,9 @@ import {
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Linking } from 'react-native';
+import Share from 'react-native-share';
 import Entypo from 'react-native-vector-icons/Entypo';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { db } from '../../../firebase.config';
 import {
   Container,
@@ -235,6 +237,17 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
       Alert.alert('Lỗi file không mở được hoặc chưa tồn tại !');
     }
   };
+  const shareFileLink = async () => {
+    try {
+      await Share.open({
+        title: 'Chia sẻ file Báo cáo',
+        message: 'Xem file Báo cáo này nhé:',
+        url: report.url, // 🔹 chỉ là link, không phải file local
+      });
+    } catch (err) {
+      console.log('❌ Lỗi chia sẻ:', err);
+    }
+  };
 
   if (!child) return <ActivityIndicator />;
   return (
@@ -323,12 +336,20 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
               styles={{ paddingVertical: 10 }}
             >
               {report.status === 'approved' && report.url !== '' && (
-                <DocumentDownload
-                  variant="Bold"
-                  size={sizes.extraTitle}
-                  color={colors.blue}
-                  onPress={openFile}
-                />
+                <>
+                  <DocumentDownload
+                    variant="Bold"
+                    size={sizes.extraTitle}
+                    color={colors.blue}
+                    onPress={openFile}
+                  />
+                  <FontAwesome5
+                    name="share-alt"
+                    size={sizes.bigTitle}
+                    color={colors.blue}
+                    onPress={shareFileLink}
+                  />
+                </>
               )}
               {report.status === 'pending' && (
                 <>

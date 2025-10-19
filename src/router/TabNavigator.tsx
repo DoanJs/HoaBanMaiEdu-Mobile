@@ -151,6 +151,7 @@ const localStyle = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-around',
-    width: 80,
+    width: 200,
+    // backgroundColor:'coral'
   },
 });

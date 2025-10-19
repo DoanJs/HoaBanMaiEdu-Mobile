@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, ImageBackground, TouchableOpacity, View } from 'react-native';
+import { Image, ImageBackground, Platform, TouchableOpacity, View } from 'react-native';
 import googlePng from '../../assets/images/google.png';
 import userPng from '../../assets/images/user.png';
 import {

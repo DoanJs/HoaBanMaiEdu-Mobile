@@ -35,7 +35,7 @@ const Container = (props: Props) => {
   const localStyle = StyleSheet.create({
     header: {
       paddingHorizontal: 16,
-      paddingVertical: 10,
+      paddingVertical: 20,
       paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     title: { paddingHorizontal: 16, flex: 1, alignItems: 'center' },

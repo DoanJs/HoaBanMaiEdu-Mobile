@@ -1,6 +1,11 @@
 import { ArrowLeft, Lock } from 'iconsax-react-native';
 import React, { useEffect, useState } from 'react';
-import { ImageBackground, TouchableOpacity, View } from 'react-native';
+import {
+  ImageBackground,
+  Platform,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import { auth, signInWithEmailAndPassword } from '../../../firebase.config';
 import {
@@ -16,7 +21,6 @@ import { colors } from '../../constants/colors';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { sizes } from '../../constants/sizes';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 const Login = ({ navigation }: any) => {
   const [email, setEmail] = useState('demo01@gmail.com');
@@ -57,7 +61,9 @@ const Login = ({ navigation }: any) => {
 
   return (
     <ImageBackground
-      source={{ uri: 'https://cdn.pixabay.com/photo/2019/10/30/16/19/fox-4589927_1280.jpg' }}
+      source={{
+        uri: 'https://cdn.pixabay.com/photo/2019/10/30/16/19/fox-4589927_1280.jpg',
+      }}
       imageStyle={{ resizeMode: 'cover' }}
       style={{ flex: 1, alignItems: 'center' }}
     >
@@ -69,7 +75,7 @@ const Login = ({ navigation }: any) => {
             onPress={() => navigation.goBack()}
           />
           <TextComponent
-            textAlign='center'
+            textAlign="center"
             text="Welcome"
             color={colors.background}
             size={sizes.title}
@@ -87,6 +93,7 @@ const Login = ({ navigation }: any) => {
           left: 0,
           bottom: 0,
           paddingVertical: 20,
+          paddingBottom: Platform.OS === 'android' ? '10%' : 0,
           borderRadius: 10,
         }}
       >
@@ -128,7 +135,7 @@ const Login = ({ navigation }: any) => {
               paddingHorizontal: 26,
               borderRadius: 5,
             }}
-            placeholder='Password'
+            placeholder="Password"
             placeholderTextColor={colors.gray}
             prefix={<Lock color={colors.text} size={26} />}
             color={colors.background}
@@ -183,7 +190,6 @@ const Login = ({ navigation }: any) => {
             title="Login"
             onPress={handleLoginWithEmail}
             isLoading={isLoading}
-
           />
 
           <RowComponent justify="center">
