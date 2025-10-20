@@ -21,7 +21,7 @@ const FieldItemComponent = (props: Props) => {
         flexDirection: 'column',
         borderWidth: 1,
         borderColor: 'coral',
-        padding: 10,
+        padding: 6,
         borderRadius: 10,
         width: '45%',
         height: 160,
@@ -32,6 +32,9 @@ const FieldItemComponent = (props: Props) => {
       {showUIIconTarget(field.name)}
       <SpaceComponent height={10} />
       <TextComponent
+        styles={{
+          textAlign: 'center'
+        }}
         text={field.name}
         color={colors.textBold}
         font={fontFamillies.poppinsBold}

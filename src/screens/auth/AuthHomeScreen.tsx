@@ -29,7 +29,7 @@ const AuthHomeScreen = ({ navigation }: any) => {
         imageStyle={{ resizeMode: 'cover' }}
         style={{ flex: 1, alignItems: 'center' }}
       >
-        <SectionComponent styles={{ backgroundColor: 'transparent', top: '5%' }}>
+        <SectionComponent styles={{ backgroundColor: 'transparent', top: '6%' }}>
           <RowComponent styles={{ width: '100%' }}>
             <TextComponent
               text="Welcome"
