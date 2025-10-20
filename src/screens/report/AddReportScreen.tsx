@@ -1,7 +1,7 @@
 import { serverTimestamp, where } from '@react-native-firebase/firestore';
-import { Profile2User } from 'iconsax-react-native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ButtonComponent,
   Container,
@@ -17,7 +17,6 @@ import { convertTargetField } from '../../constants/convertTargetAndField';
 import { addDocData } from '../../constants/firebase/addDocData';
 import { getDocsData } from '../../constants/firebase/getDocsData';
 import { groupArrayWithField } from '../../constants/groupArrayWithField';
-import { sizes } from '../../constants/sizes';
 import { PlanModel, PlanTaskModel } from '../../models';
 import {
   useChildStore,
@@ -29,6 +28,7 @@ import {
 import AddReportItemComponent from './AddReportItemComponent';
 
 const AddReportScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets()
   const { child } = useChildStore();
   const { user } = useUserStore();
   const { targets } = useTargetStore();
@@ -145,79 +145,74 @@ const AddReportScreen = ({ navigation }: any) => {
   console.log(addReports);
   if (!child) return <ActivityIndicator />;
   return (
-    <Container
-      back
-      bg={colors.primaryLight}
-      title={child.fullName}
-      uri={child.avatar}
-      right={
-        <Profile2User
-          size={sizes.title}
-          color={colors.textBold}
-          variant="Bold"
-          onPress={() => navigation.navigate('ChildrenScreen')}
-        />
-      }
-    >
-      <SectionComponent
-        styles={{
-          backgroundColor: colors.background,
-          flex: 1,
-          paddingVertical: 10,
-        }}
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <Container
+        back
+        bg={colors.primaryLight}
+        title={child.fullName}
+        uri={child.avatar}
       >
-        <TouchableOpacity onPress={() => setIsVisibleAddReport(true)}>
-          <TextComponent
-            text={planSelected ? planSelected.title : 'Chọn kế hoạch tháng'}
-            styles={{
-              backgroundColor: colors.primary + '80',
-              padding: 10,
-              borderRadius: 10,
-              textAlign: 'center',
-            }}
-          />
-        </TouchableOpacity>
-        <SpaceComponent height={10} />
+        <SectionComponent
+          styles={{
+            backgroundColor: colors.background,
+            flex: 1,
+            paddingVertical: 10,
+          }}
+        >
+          <TouchableOpacity onPress={() => setIsVisibleAddReport(true)}>
+            <TextComponent
+              text={planSelected ? planSelected.title : 'Chọn kế hoạch tháng'}
+              styles={{
+                backgroundColor: colors.primary + '80',
+                padding: 10,
+                borderRadius: 10,
+                textAlign: 'center',
+              }}
+            />
+          </TouchableOpacity>
+          <SpaceComponent height={10} />
 
-        {planSelected && (
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={hanldeGroupPlanWithField(addReports)}
-            renderItem={({ item, index }) => (
-              <AddReportItemComponent
-                key={item.id}
-                index={index}
-                addReport={item}
-                onChange={(data: { val: string; planTaskId: string }) =>
-                  handleChangeValue(data)
-                }
-              />
-            )}
-            ListFooterComponent={
-              <RowComponent
-                justify="space-around"
-                styles={{ paddingVertical: 16 }}
-              >
-                <ButtonComponent
-                  color={colors.green}
-                  text="Gửi duyệt"
-                  onPress={handleAddReport}
-                  styles={{ flex: 1 }}
+          {planSelected && (
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
+              data={hanldeGroupPlanWithField(addReports)}
+              renderItem={({ item, index }) => (
+                <AddReportItemComponent
+                  key={item.id}
+                  index={index}
+                  addReport={item}
+                  onChange={(data: { val: string; planTaskId: string }) =>
+                    handleChangeValue(data)
+                  }
                 />
-              </RowComponent>
-            }
-          />
-        )}
-      </SectionComponent>
+              )}
+              ListFooterComponent={
+                <RowComponent
+                  justify="space-around"
+                  styles={{ paddingVertical: 16 }}
+                >
+                  <ButtonComponent
+                    color={colors.green}
+                    text="Gửi duyệt"
+                    onPress={handleAddReport}
+                    styles={{ flex: 1 }}
+                  />
+                </RowComponent>
+              }
+            />
+          )}
+        </SectionComponent>
 
-      <AddReportModal
-        visible={isVisibleAddReport}
-        onClose={() => setIsVisibleAddReport(false)}
-        onChange={val => setPlanSelected(val)}
-        planSelected={planSelected}
-      />
-      <SpinnerComponent loading={isLoading} />
-    </Container>
+        <AddReportModal
+          visible={isVisibleAddReport}
+          onClose={() => setIsVisibleAddReport(false)}
+          onChange={val => setPlanSelected(val)}
+          planSelected={planSelected}
+        />
+        <SpinnerComponent loading={isLoading} />
+      </Container>
+    </SafeAreaView>
   );
 };
 

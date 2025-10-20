@@ -27,8 +27,10 @@ import {
   useReportStore,
   useUserStore,
 } from '../../zustand/store';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const PendingScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets()
   const [selected, setSelected] = useState('Kế hoạch');
   const { child } = useChildStore();
   const { user } = useUserStore();
@@ -69,97 +71,90 @@ const PendingScreen = ({ navigation }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <Container
-      bg={colors.primaryLight}
-      title={child.fullName}
-      uri={child.avatar}
-      right={
-        <Profile2User
-          size={sizes.title}
-          color={colors.textBold}
-          variant="Bold"
-          onPress={() => navigation.navigate('ChildrenScreen')}
-        />
-      }
-    >
-      <SectionComponent
-        styles={{
-          backgroundColor: colors.background,
-          flex: 1,
-          paddingVertical: 10,
-        }}
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <Container
+        bg={colors.primaryLight}
+        title={child.fullName}
+        uri={child.avatar}
       >
-        <RowComponent
-          justify="space-between"
+        <SectionComponent
           styles={{
-            borderBottomColor: colors.textBold,
-            borderBottomWidth: 1,
-            paddingBottom: 10,
+            backgroundColor: colors.background,
+            flex: 1,
+            paddingVertical: 10,
           }}
         >
-          <TouchableOpacity
-            onPress={() => setSelected('Kế hoạch')}
-            style={{
-              backgroundColor:
-                selected === 'Kế hoạch' ? 'coral' : colors.background,
-              padding: 10,
-              borderRadius: 10,
-            }}
-          >
-            <TextComponent
-              text="Kế hoạch"
-              font={fontFamillies.poppinsBold}
-              color={selected === 'Kế hoạch' ? colors.background : colors.text}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setSelected('Báo cáo')}
-            style={{
-              backgroundColor:
-                selected === 'Báo cáo' ? 'coral' : colors.background,
-              padding: 10,
-              borderRadius: 10,
-            }}
-          >
-            <TextComponent
-              text="Báo cáo"
-              font={fontFamillies.poppinsBold}
-              color={selected === 'Báo cáo' ? colors.background : colors.text}
-            />
-          </TouchableOpacity>
-        </RowComponent>
-
-        <SpaceComponent height={10} />
-
-        <SearchComponent
-          arrSource={
-            selected === 'Kế hoạch'
-              ? plans.filter(plan => plan.status === 'pending')
-              : reports.filter(report => report.status === 'pending')
-          }
-          onChange={
-            selected === 'Kế hoạch'
-              ? val => setPlanNews(val)
-              : val => setReportNews(val)
-          }
-          placeholder={`Nhập ${
-            selected === 'Kế hoạch' ? 'kế hoạch' : 'báo cáo'
-          }`}
-          type={selected === 'Kế hoạch' ? 'searchPlan' : 'searchReport'}
-        />
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
           <RowComponent
-            justify="space-around"
-            styles={{ flexWrap: 'wrap', paddingTop: 10 }}
+            justify="space-between"
+            styles={{
+              borderBottomColor: colors.textBold,
+              borderBottomWidth: 1,
+              paddingBottom: 10,
+            }}
           >
-            {selected === 'Kế hoạch'
-              ? planNews.map((_, index) => (
+            <TouchableOpacity
+              onPress={() => setSelected('Kế hoạch')}
+              style={{
+                backgroundColor:
+                  selected === 'Kế hoạch' ? 'coral' : colors.background,
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              <TextComponent
+                text="Kế hoạch"
+                font={fontFamillies.poppinsBold}
+                color={selected === 'Kế hoạch' ? colors.background : colors.text}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setSelected('Báo cáo')}
+              style={{
+                backgroundColor:
+                  selected === 'Báo cáo' ? 'coral' : colors.background,
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              <TextComponent
+                text="Báo cáo"
+                font={fontFamillies.poppinsBold}
+                color={selected === 'Báo cáo' ? colors.background : colors.text}
+              />
+            </TouchableOpacity>
+          </RowComponent>
+
+          <SpaceComponent height={10} />
+
+          <SearchComponent
+            arrSource={
+              selected === 'Kế hoạch'
+                ? plans.filter(plan => plan.status === 'pending')
+                : reports.filter(report => report.status === 'pending')
+            }
+            onChange={
+              selected === 'Kế hoạch'
+                ? val => setPlanNews(val)
+                : val => setReportNews(val)
+            }
+            placeholder={`Nhập ${selected === 'Kế hoạch' ? 'kế hoạch' : 'báo cáo'
+              }`}
+            type={selected === 'Kế hoạch' ? 'searchPlan' : 'searchReport'}
+          />
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            <RowComponent
+              justify="space-around"
+              styles={{ flexWrap: 'wrap', paddingTop: 10 }}
+            >
+              {selected === 'Kế hoạch'
+                ? planNews.map((_, index) => (
                   <TouchableOpacity
                     onPress={() =>
                       navigation.navigate('PlanDetailScreen', { plan: _ })
@@ -198,7 +193,7 @@ const PendingScreen = ({ navigation }: any) => {
                     )}
                   </TouchableOpacity>
                 ))
-              : reportNews.map((_, index) => (
+                : reportNews.map((_, index) => (
                   <TouchableOpacity
                     onPress={() =>
                       navigation.navigate('ReportDetailScreen', { report: _ })
@@ -237,10 +232,11 @@ const PendingScreen = ({ navigation }: any) => {
                     )}
                   </TouchableOpacity>
                 ))}
-          </RowComponent>
-        </ScrollView>
-      </SectionComponent>
-    </Container>
+            </RowComponent>
+          </ScrollView>
+        </SectionComponent>
+      </Container>
+    </SafeAreaView>
   );
 };
 

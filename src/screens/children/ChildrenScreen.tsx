@@ -36,6 +36,7 @@ import {
   useUserStore,
 } from '../../zustand/store';
 import ChildItemComponent from './ChildItemComponent';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // const children = [
 //   {
@@ -249,45 +250,47 @@ const ChildrenScreen = () => {
   // };
 
   return (
-    <Container
-      bg={colors.primaryLight}
-      uri={user?.avatar}
-      title={`Cô ${user?.fullName}`}
-      right={
-        <Logout
-          onPress={handleLogout}
-          size={sizes.title}
-          color={colors.orange}
-          variant="Bold"
-        />
-      }
-    >
-      <SectionComponent
-        styles={{
-          backgroundColor: colors.background,
-          flex: 1,
-          paddingVertical: 10,
-        }}
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <Container
+        bg={colors.primaryLight}
+        uri={user?.avatar}
+        title={`Cô ${user?.fullName}`}
+        right={
+          <Logout
+            onPress={handleLogout}
+            size={sizes.smallHeader}
+            color={colors.orange}
+            variant="Bold"
+          />
+        }
       >
-        {/* <RowComponent onPress={uploadData}>
+        <SectionComponent
+          styles={{
+            backgroundColor: colors.background,
+            flex: 1,
+            paddingVertical: 10,
+          }}
+        >
+          {/* <RowComponent onPress={uploadData}>
           <TextComponent text="Upload Data" />
         </RowComponent> */}
-        <SearchComponent
-          arrSource={data_children as ChildrenModel[]}
-          onChange={val => setChildren(val)}
-          placeholder="Nhập tên trẻ"
-          type="searchChild"
-        />
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
-            {children.length > 0 &&
-              children.map((_, index) => (
-                <ChildItemComponent key={index} child={_} />
-              ))}
-          </RowComponent>
-        </ScrollView>
-      </SectionComponent>
-    </Container>
+          <SearchComponent
+            arrSource={data_children as ChildrenModel[]}
+            onChange={val => setChildren(val)}
+            placeholder="Nhập tên trẻ"
+            type="searchChild"
+          />
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
+              {children.length > 0 &&
+                children.map((_, index) => (
+                  <ChildItemComponent key={index} child={_} />
+                ))}
+            </RowComponent>
+          </ScrollView>
+        </SectionComponent>
+      </Container>
+    </SafeAreaView>
   );
 };
 

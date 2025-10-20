@@ -20,6 +20,7 @@ import {
 import { colors } from '../../constants/colors';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { sizes } from '../../constants/sizes';
+import { SafeAreaView } from 'react-native-safe-area-context';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }: any) => {
@@ -60,158 +61,159 @@ const Login = ({ navigation }: any) => {
   };
 
   return (
-    <ImageBackground
-      source={{
-        uri: 'https://cdn.pixabay.com/photo/2019/10/30/16/19/fox-4589927_1280.jpg',
-      }}
-      imageStyle={{ resizeMode: 'cover' }}
-      style={{ flex: 1, alignItems: 'center' }}
-    >
-      <SectionComponent styles={{ backgroundColor: 'transparent', top: '5%' }}>
-        <RowComponent styles={{ width: '100%' }}>
-          <ArrowLeft
-            size={28}
-            color={colors.background}
-            onPress={() => navigation.goBack()}
-          />
-          <TextComponent
-            textAlign="center"
-            text="Welcome"
-            color={colors.background}
-            size={sizes.title}
-            flex={1}
-            font={fontFamillies.poppinsBold}
-          />
-        </RowComponent>
-      </SectionComponent>
-
-      <View
-        style={{
-          backgroundColor: colors.background1,
-          position: 'absolute',
-          right: 0,
-          left: 0,
-          bottom: 0,
-          paddingVertical: 20,
-          paddingBottom: Platform.OS === 'android' ? '10%' : 0,
-          borderRadius: 10,
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <ImageBackground
+        source={{
+          uri: 'https://cdn.pixabay.com/photo/2019/10/30/16/19/fox-4589927_1280.jpg',
         }}
+        imageStyle={{ resizeMode: 'cover' }}
+        style={{ flex: 1, alignItems: 'center' }}
       >
-        <SectionComponent>
-          <TextComponent
-            text="Welcome back !"
-            font={fontFamillies.poppinsSemiBold}
-            size={sizes.title}
-          />
-          <TextComponent
-            text="Sign in to your account"
-            color={colors.text}
-            size={sizes.text}
-            font={fontFamillies.poppinsRegular}
-          />
-
-          <SpaceComponent height={16} />
-
-          <InputComponent
-            styles={{
-              backgroundColor: colors.background,
-              paddingVertical: 12,
-              paddingHorizontal: 26,
-              borderRadius: 5,
-            }}
-            allowClear
-            prefix={<Fontisto name="email" color={colors.text} size={26} />}
-            placeholder="Email Address"
-            placeholderTextColor={colors.gray}
-            color={colors.background}
-            value={email}
-            onChange={val => setEmail(val)}
-          />
-          <SpaceComponent height={10} />
-          <InputComponent
-            styles={{
-              backgroundColor: colors.background,
-              paddingVertical: 12,
-              paddingHorizontal: 26,
-              borderRadius: 5,
-            }}
-            placeholder="Password"
-            placeholderTextColor={colors.gray}
-            prefix={<Lock color={colors.text} size={26} />}
-            color={colors.background}
-            value={password}
-            isPassword
-            textStyles={{
-              color: colors.text,
-            }}
-            onChange={val => setPassword(val)}
-          />
-          <SpaceComponent height={10} />
-
-          <RowComponent justify="space-between">
-            <CheckedButtonComponent
-              onPress={() => setRemember(!remember)}
-              title="Remember me"
-              titleStyles={{
-                fontFamily: fontFamillies.poppinsMedium,
-                fontSize: sizes.text,
-                color: colors.text,
-              }}
-              value={remember}
+        <SectionComponent styles={{ backgroundColor: 'transparent', top: '5%' }}>
+          <RowComponent styles={{ width: '100%' }}>
+            <ArrowLeft
+              size={28}
+              color={colors.background}
+              onPress={() => navigation.goBack()}
             />
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('ForgotPasswordScreen')}
-            >
-              <TextComponent
-                text="Forgot password"
-                color={colors.blue}
-                size={sizes.text}
-                font={fontFamillies.poppinsMedium}
-              />
-            </TouchableOpacity>
-          </RowComponent>
-
-          {errorText !== '' && (
             <TextComponent
-              text={errorText}
-              color={colors.red}
-              font={fontFamillies.poppinsSemiBold}
-              size={sizes.smallText}
-              styles={{
-                marginTop: 8,
-              }}
+              textAlign="center"
+              text="Welcome"
+              color={colors.background}
+              size={sizes.title}
+              flex={1}
+              font={fontFamillies.poppinsBold}
             />
-          )}
-
-          <SpaceComponent height={16} />
-
-          <BtnShadowLinearComponent
-            title="Login"
-            onPress={handleLoginWithEmail}
-            isLoading={isLoading}
-          />
-
-          <RowComponent justify="center">
-            <TextComponent
-              text="Don’t have an account ?"
-              size={sizes.text}
-              font={fontFamillies.poppinsLight}
-              color={colors.text}
-            />
-            <SpaceComponent width={10} />
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <TextComponent
-                text="Sign up"
-                color={colors.text}
-                size={sizes.text}
-                font={fontFamillies.poppinsMedium}
-              />
-            </TouchableOpacity>
           </RowComponent>
         </SectionComponent>
-      </View>
-    </ImageBackground>
+
+        <View
+          style={{
+            backgroundColor: colors.background1,
+            position: 'absolute',
+            right: 0,
+            left: 0,
+            bottom: 0,
+            paddingVertical: 20,
+            borderRadius: 10,
+          }}
+        >
+          <SectionComponent>
+            <TextComponent
+              text="Welcome back !"
+              font={fontFamillies.poppinsSemiBold}
+              size={sizes.title}
+            />
+            <TextComponent
+              text="Sign in to your account"
+              color={colors.text}
+              size={sizes.text}
+              font={fontFamillies.poppinsRegular}
+            />
+
+            <SpaceComponent height={16} />
+
+            <InputComponent
+              styles={{
+                backgroundColor: colors.background,
+                paddingVertical: 12,
+                paddingHorizontal: 26,
+                borderRadius: 5,
+              }}
+              allowClear
+              prefix={<Fontisto name="email" color={colors.text} size={26} />}
+              placeholder="Email Address"
+              placeholderTextColor={colors.gray}
+              color={colors.background}
+              value={email}
+              onChange={val => setEmail(val)}
+            />
+            <SpaceComponent height={10} />
+            <InputComponent
+              styles={{
+                backgroundColor: colors.background,
+                paddingVertical: 12,
+                paddingHorizontal: 26,
+                borderRadius: 5,
+              }}
+              placeholder="Password"
+              placeholderTextColor={colors.gray}
+              prefix={<Lock color={colors.text} size={26} />}
+              color={colors.background}
+              value={password}
+              isPassword
+              textStyles={{
+                color: colors.text,
+              }}
+              onChange={val => setPassword(val)}
+            />
+            <SpaceComponent height={10} />
+
+            <RowComponent justify="space-between">
+              <CheckedButtonComponent
+                onPress={() => setRemember(!remember)}
+                title="Remember me"
+                titleStyles={{
+                  fontFamily: fontFamillies.poppinsMedium,
+                  fontSize: sizes.text,
+                  color: colors.text,
+                }}
+                value={remember}
+              />
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate('ForgotPasswordScreen')}
+              >
+                <TextComponent
+                  text="Forgot password"
+                  color={colors.blue}
+                  size={sizes.text}
+                  font={fontFamillies.poppinsMedium}
+                />
+              </TouchableOpacity>
+            </RowComponent>
+
+            {errorText !== '' && (
+              <TextComponent
+                text={errorText}
+                color={colors.red}
+                font={fontFamillies.poppinsSemiBold}
+                size={sizes.smallText}
+                styles={{
+                  marginTop: 8,
+                }}
+              />
+            )}
+
+            <SpaceComponent height={16} />
+
+            <BtnShadowLinearComponent
+              title="Login"
+              onPress={handleLoginWithEmail}
+              isLoading={isLoading}
+            />
+
+            <RowComponent justify="center">
+              <TextComponent
+                text="Don’t have an account ?"
+                size={sizes.text}
+                font={fontFamillies.poppinsLight}
+                color={colors.text}
+              />
+              <SpaceComponent width={10} />
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <TextComponent
+                  text="Sign up"
+                  color={colors.text}
+                  size={sizes.text}
+                  font={fontFamillies.poppinsMedium}
+                />
+              </TouchableOpacity>
+            </RowComponent>
+          </SectionComponent>
+        </View>
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 

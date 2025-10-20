@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ChildrenScreen } from '../screens';
-import MainHomeNavigator from './MainHomeNavigator';
+import { MainHomeNavigator } from '.';
 
 const MainNavigator = () => {
   const Stack = createNativeStackNavigator();

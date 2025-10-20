@@ -20,8 +20,10 @@ import {
   useReportStore,
   useUserStore,
 } from '../../zustand/store';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ReportScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets()
   const { child } = useChildStore();
   const { user } = useUserStore();
   const { reports, setReports } = useReportStore();
@@ -51,77 +53,72 @@ const ReportScreen = ({ navigation }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <Container
-      bg={colors.primaryLight}
-      title={child.fullName}
-      uri={child.avatar}
-      right={
-        <Profile2User
-          size={sizes.title}
-          color={colors.textBold}
-          variant="Bold"
-          onPress={() => navigation.navigate('ChildrenScreen')}
-        />
-      }
-    >
-      <SectionComponent
-        styles={{
-          backgroundColor: colors.background,
-          flex: 1,
-          paddingVertical: 10,
-        }}
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <Container
+        bg={colors.primaryLight}
+        title={child.fullName}
+        uri={child.avatar}
       >
-        <RowComponent>
-          <SearchComponent
-            styles={{ flex: 1 }}
-            arrSource={reports.filter(report => report.status === 'approved')}
-            onChange={val => setReportsApproved(val)}
-            placeholder="Nhập báo cáo"
-            type="searchReport"
-          />
-          <SpaceComponent width={20} />
-          <AddCircle
-            onPress={() => navigation.navigate('AddReportScreen')}
-            size={sizes.title}
-            color={colors.primary}
-            variant="Bold"
-          />
-        </RowComponent>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+        <SectionComponent
+          styles={{
+            backgroundColor: colors.background,
+            flex: 1,
+            paddingVertical: 10,
+          }}
         >
-          <SpaceComponent height={6} />
-          <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
-            {reportsApproved.map((_, index) => (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('ReportDetailScreen', { report: _ })
-                }
-                key={index}
-                style={{
-                  padding: 10,
-                  width: '45%',
-                  alignItems: 'center',
-                  borderWidth: 1,
-                  borderColor: 'coral',
-                  borderRadius: 100,
-                  marginBottom: 10,
-                  marginLeft: 10,
-                }}
-              >
-                <TextComponent
-                  text={_.title}
-                  font={fontFamillies.poppinsBold}
-                />
-              </TouchableOpacity>
-            ))}
+          <RowComponent>
+            <SearchComponent
+              styles={{ flex: 1 }}
+              arrSource={reports.filter(report => report.status === 'approved')}
+              onChange={val => setReportsApproved(val)}
+              placeholder="Nhập báo cáo"
+              type="searchReport"
+            />
+            <SpaceComponent width={20} />
+            <AddCircle
+              onPress={() => navigation.navigate('AddReportScreen')}
+              size={sizes.title}
+              color={colors.primary}
+              variant="Bold"
+            />
           </RowComponent>
-        </ScrollView>
-      </SectionComponent>
-    </Container>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            <SpaceComponent height={6} />
+            <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
+              {reportsApproved.map((_, index) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('ReportDetailScreen', { report: _ })
+                  }
+                  key={index}
+                  style={{
+                    padding: 10,
+                    width: '45%',
+                    alignItems: 'center',
+                    borderWidth: 1,
+                    borderColor: 'coral',
+                    borderRadius: 100,
+                    marginBottom: 10,
+                    marginLeft: 10,
+                  }}
+                >
+                  <TextComponent
+                    text={_.title}
+                    font={fontFamillies.poppinsBold}
+                  />
+                </TouchableOpacity>
+              ))}
+            </RowComponent>
+          </ScrollView>
+        </SectionComponent>
+      </Container>
+    </SafeAreaView>
   );
 };
 

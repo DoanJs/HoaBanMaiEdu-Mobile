@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { ArrowLeft } from 'iconsax-react-native';
+import { ArrowLeft, Profile2User } from 'iconsax-react-native';
 import React, { ReactNode } from 'react';
 import {
   Image,
@@ -61,8 +61,8 @@ const Container = (props: Props) => {
             <RowComponent styles={[localStyle.title]}>
               <Image
                 style={{
-                  height: 32,
-                  width: 32,
+                  height: sizes.header,
+                  width: sizes.smallHeader,
                   borderRadius: 100,
                   resizeMode: 'cover',
                 }}
@@ -81,7 +81,14 @@ const Container = (props: Props) => {
             </RowComponent>
           )}
           {center && center}
-          {right && right}
+          {right ? right :
+            <Profile2User
+              size={sizes.smallHeader}
+              color={colors.textBold}
+              variant="Bold"
+              onPress={() => navigation.navigate('ChildrenScreen')}
+            />
+          }
         </RowComponent>
       )}
       {!isScroll ? (

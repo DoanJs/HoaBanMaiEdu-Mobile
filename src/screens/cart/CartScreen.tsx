@@ -44,8 +44,10 @@ import {
   useUserStore,
 } from '../../zustand/store';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const CartScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets()
   const { user } = useUserStore();
   const { carts, setCarts } = useCartStore();
   const { child } = useChildStore();
@@ -249,146 +251,141 @@ const CartScreen = ({ navigation }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <Container
-      bg={colors.primaryLight}
-      title={child.fullName}
-      uri={child.avatar}
-      right={
-        <Profile2User
-          size={sizes.title}
-          color={colors.textBold}
-          variant="Bold"
-          onPress={() => navigation.navigate('ChildrenScreen')}
-        />
-      }
-    >
-      <SectionComponent
-        styles={{
-          backgroundColor: colors.background,
-          flex: 1,
-          paddingVertical: 10,
-        }}
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <Container
+        bg={colors.primaryLight}
+        title={child.fullName}
+        uri={child.avatar}
       >
-        {carts.length > 0 ? (
-          <>
-            <RowComponent>
-              <InputComponent
-                styles={{
-                  backgroundColor: colors.background,
-                  borderRadius: 5,
-                  flex: 1,
-                }}
-                allowClear
-                placeholder="Tên kế hoạch: "
-                placeholderTextColor={colors.text}
-                color={colors.gray}
-                value={title}
-                onChange={val => setTitle(val)}
-              />
-              <SpaceComponent width={20} />
-              <AddCircle
-                onPress={() => navigation.navigate('Target')}
-                size={sizes.title}
-                color={colors.primary}
-                variant="Bold"
-              />
-            </RowComponent>
+        <SectionComponent
+          styles={{
+            backgroundColor: colors.background,
+            flex: 1,
+            paddingVertical: 10,
+          }}
+        >
+          {carts.length > 0 ? (
+            <>
+              <RowComponent>
+                <InputComponent
+                  styles={{
+                    backgroundColor: colors.background,
+                    borderRadius: 5,
+                    flex: 1,
+                  }}
+                  allowClear
+                  placeholder="Tên kế hoạch: "
+                  placeholderTextColor={colors.text}
+                  color={colors.gray}
+                  value={title}
+                  onChange={val => setTitle(val)}
+                />
+                <SpaceComponent width={20} />
+                <AddCircle
+                  onPress={() => navigation.navigate('Target')}
+                  size={sizes.title}
+                  color={colors.primary}
+                  variant="Bold"
+                />
+              </RowComponent>
 
-            <SpaceComponent height={10} />
+              <SpaceComponent height={10} />
 
-            <GestureHandlerRootView>
-              <FlatList
-                showsVerticalScrollIndicator={false}
-                data={groupArrayWithField(carts, 'fieldId')}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                  />
-                }
-                renderItem={({ item, index }) => (
-                  <CartItemComponent key={item.id} index={index} cart={item} />
-                )}
-                ListFooterComponent={
-                  carts.length > 0 ? (
-                    <RowComponent justify="space-around">
-                      {title === '' ? (
-                        <>
-                          <ButtonComponent
-                            color="coral"
-                            text="Lưu nháp"
-                            onPress={handleSaveCart}
-                            styles={{ flex: 1 }}
-                          />
-                          <SpaceComponent width={16} />
-                          <ButtonComponent
-                            color={colors.green}
-                            text={'Gửi duyệt'}
-                            onPress={() => setIsVisibleTitlePlan(true)}
-                            styles={{ flex: 1 }}
-                          />
-                        </>
-                      ) : (
-                        <>
-                          {!cartEdit && (
+              <GestureHandlerRootView>
+                <FlatList
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{paddingBottom: insets.bottom + 80}}
+                  data={groupArrayWithField(carts, 'fieldId')}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                    />
+                  }
+                  renderItem={({ item, index }) => (
+                    <CartItemComponent key={item.id} index={index} cart={item} />
+                  )}
+                  ListFooterComponent={
+                    carts.length > 0 ? (
+                      <RowComponent justify="space-around">
+                        {title === '' ? (
+                          <>
                             <ButtonComponent
                               color="coral"
                               text="Lưu nháp"
                               onPress={handleSaveCart}
                               styles={{ flex: 1 }}
                             />
-                          )}
-                          <SpaceComponent width={16} />
-                          <ButtonComponent
-                            color={cartEdit ? colors.blue : colors.green}
-                            textStyles={{
-                              color: cartEdit ? colors.background : colors.text,
-                            }}
-                            text={cartEdit ? 'Lưu' : 'Gửi duyệt'}
-                            onPress={handleAddEditPlan}
-                            styles={{ flex: 1 }}
-                          />
-                        </>
-                      )}
-                    </RowComponent>
-                  ) : (
-                    <></>
-                  )
-                }
+                            <SpaceComponent width={16} />
+                            <ButtonComponent
+                              color={colors.green}
+                              text={'Gửi duyệt'}
+                              onPress={() => setIsVisibleTitlePlan(true)}
+                              styles={{ flex: 1 }}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            {!cartEdit && (
+                              <ButtonComponent
+                                color="coral"
+                                text="Lưu nháp"
+                                onPress={handleSaveCart}
+                                styles={{ flex: 1 }}
+                              />
+                            )}
+                            <SpaceComponent width={16} />
+                            <ButtonComponent
+                              color={cartEdit ? colors.blue : colors.green}
+                              textStyles={{
+                                color: cartEdit ? colors.background : colors.text,
+                              }}
+                              text={cartEdit ? 'Lưu' : 'Gửi duyệt'}
+                              onPress={handleAddEditPlan}
+                              styles={{ flex: 1 }}
+                            />
+                          </>
+                        )}
+                      </RowComponent>
+                    ) : (
+                      <></>
+                    )
+                  }
+                />
+              </GestureHandlerRootView>
+            </>
+          ) : (
+            <RowComponent justify="center">
+              <TextComponent
+                text="Giỏ mục tiêu trống !"
+                font={fontFamillies.poppinsBold}
               />
-            </GestureHandlerRootView>
-          </>
-        ) : (
-          <RowComponent justify="center">
-            <TextComponent
-              text="Giỏ mục tiêu trống !"
-              font={fontFamillies.poppinsBold}
-            />
-            <SpaceComponent width={10} />
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Target')}
-              style={{
-                backgroundColor: colors.green,
-                padding: 10,
-                borderRadius: 10,
-              }}
-            >
-              <TextComponent text="Tạo kế hoạch mới" />
-            </TouchableOpacity>
-          </RowComponent>
-        )}
-      </SectionComponent>
+              <SpaceComponent width={10} />
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Target')}
+                style={{
+                  backgroundColor: colors.green,
+                  padding: 10,
+                  borderRadius: 10,
+                }}
+              >
+                <TextComponent text="Tạo kế hoạch mới" />
+              </TouchableOpacity>
+            </RowComponent>
+          )}
+        </SectionComponent>
 
-      <SpinnerComponent loading={isLoading} />
-      <TitlePlanModal
-        visible={isVisibleTitlePlan}
-        title={title}
-        setTitle={setTitle}
-        onChange={val => setTitle(val)}
-        onClose={() => setIsVisibleTitlePlan(false)}
-        handleAddEditPlan={handleAddEditPlan}
-      />
-    </Container>
+        <SpinnerComponent loading={isLoading} />
+        <TitlePlanModal
+          visible={isVisibleTitlePlan}
+          title={title}
+          setTitle={setTitle}
+          onChange={val => setTitle(val)}
+          onClose={() => setIsVisibleTitlePlan(false)}
+          handleAddEditPlan={handleAddEditPlan}
+        />
+      </Container>
+    </SafeAreaView>
   );
 };
 

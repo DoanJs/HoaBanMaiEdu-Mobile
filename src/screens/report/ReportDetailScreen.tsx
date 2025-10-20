@@ -45,9 +45,11 @@ import {
   useUserStore,
 } from '../../zustand/store';
 import ReportItemComponent from './ReportItemComponent';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ReportDetailScreen = ({ navigation, route }: any) => {
   const { report } = route.params;
+  const insets = useSafeAreaInsets()
   const { child } = useChildStore();
   const { user } = useUserStore();
   const [disable, setDisable] = useState(true);
@@ -251,155 +253,150 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <Container
-      back
-      bg={colors.primaryLight}
-      title={child.fullName}
-      right={
-        <Profile2User
-          size={sizes.title}
-          color={colors.textBold}
-          variant="Bold"
-          onPress={() => navigation.navigate('ChildrenScreen')}
-        />
-      }
-    >
-      <SectionComponent
-        styles={{
-          backgroundColor: colors.background,
-          flex: 1,
-          paddingVertical: 10,
-        }}
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <Container
+        back
+        bg={colors.primaryLight}
+        title={child.fullName}
       >
-        <RowComponent justify="space-between">
-          <TextComponent text={report.title} font={fontFamillies.poppinsBold} />
-          {isComment && report.status === 'pending' && (
-            <MessageNotif
-              size={sizes.title}
-              color={colors.red}
-              variant="Bold"
-              onPress={() => setIsVisibleCommentModal(true)}
-            />
-          )}
-          {!isComment &&
-            report.status === 'pending' &&
-            ['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
-              <MessageAdd
+        <SectionComponent
+          styles={{
+            backgroundColor: colors.background,
+            flex: 1,
+            paddingVertical: 10,
+          }}
+        >
+          <RowComponent justify="space-between">
+            <TextComponent text={report.title} font={fontFamillies.poppinsBold} />
+            {isComment && report.status === 'pending' && (
+              <MessageNotif
                 size={sizes.title}
-                color={colors.green}
+                color={colors.red}
                 variant="Bold"
                 onPress={() => setIsVisibleCommentModal(true)}
               />
             )}
-          {convertTimeStampFirestore(report?.createAt) !==
-          convertTimeStampFirestore(report?.updateAt) ? (
-            <TextComponent
-              styles={{ fontStyle: 'italic' }}
-              text={`Cập nhật: ${moment(
-                convertTimeStampFirestore(report?.updateAt),
-              ).format('HH:mm:ss DD/MM/YYYY')}`}
-              size={sizes.smallText}
-            />
-          ) : (
-            <TextComponent
-              styles={{ fontStyle: 'italic' }}
-              text={`Gửi lên: ${moment(
-                convertTimeStampFirestore(report?.createAt),
-              ).format('HH:mm:ss_DD/MM/YYYY')}`}
-              size={sizes.smallText}
-            />
-          )}
-          <TextComponent
-            text={report.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
-            size={sizes.smallText}
-            styles={{ fontStyle: 'italic' }}
-          />
-        </RowComponent>
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={handleGroupReportWithField(reportTasks)}
-          renderItem={({ item, index }) => (
-            <ReportItemComponent
-              key={index}
-              index={index}
-              report={report}
-              reportTask={item}
-              reportTasks={reportTasks}
-              onSetReportTasks={setReportTasks}
-              setDisable={setDisable}
-              onChange={() => {}}
-            />
-          )}
-          ListFooterComponent={
-            <RowComponent
-              justify="space-around"
-              styles={{ paddingVertical: 10 }}
-            >
-              {report.status === 'approved' && report.url !== '' && (
-                <>
-                  <DocumentDownload
-                    variant="Bold"
-                    size={sizes.extraTitle}
-                    color={colors.blue}
-                    onPress={openFile}
-                  />
-                  <FontAwesome5
-                    name="share-alt"
-                    size={sizes.bigTitle}
-                    color={colors.blue}
-                    onPress={shareFileLink}
-                  />
-                </>
+            {!isComment &&
+              report.status === 'pending' &&
+              ['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
+                <MessageAdd
+                  size={sizes.title}
+                  color={colors.green}
+                  variant="Bold"
+                  onPress={() => setIsVisibleCommentModal(true)}
+                />
               )}
-              {report.status === 'pending' && (
-                <>
-                  {user?.role === 'admin' && (
-                    <ArchiveTick
+            {convertTimeStampFirestore(report?.createAt) !==
+              convertTimeStampFirestore(report?.updateAt) ? (
+              <TextComponent
+                styles={{ fontStyle: 'italic' }}
+                text={`Cập nhật: ${moment(
+                  convertTimeStampFirestore(report?.updateAt),
+                ).format('HH:mm:ss DD/MM/YYYY')}`}
+                size={sizes.smallText}
+              />
+            ) : (
+              <TextComponent
+                styles={{ fontStyle: 'italic' }}
+                text={`Gửi lên: ${moment(
+                  convertTimeStampFirestore(report?.createAt),
+                ).format('HH:mm:ss_DD/MM/YYYY')}`}
+                size={sizes.smallText}
+              />
+            )}
+            <TextComponent
+              text={report.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
+              size={sizes.smallText}
+              styles={{ fontStyle: 'italic' }}
+            />
+          </RowComponent>
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{paddingBottom: insets.bottom + 80}}
+            data={handleGroupReportWithField(reportTasks)}
+            renderItem={({ item, index }) => (
+              <ReportItemComponent
+                key={index}
+                index={index}
+                report={report}
+                reportTask={item}
+                reportTasks={reportTasks}
+                onSetReportTasks={setReportTasks}
+                setDisable={setDisable}
+                onChange={() => { }}
+              />
+            )}
+            ListFooterComponent={
+              <RowComponent
+                justify="space-around"
+                styles={{ paddingVertical: 10 }}
+              >
+                {report.status === 'approved' && report.url !== '' && (
+                  <>
+                    <DocumentDownload
                       variant="Bold"
                       size={sizes.extraTitle}
-                      color={colors.green}
-                      onPress={handleApproved}
+                      color={colors.blue}
+                      onPress={openFile}
                     />
-                  )}
-                  <Entypo
-                    name="save"
-                    size={sizes.extraTitle}
-                    color={disable ? colors.gray2 : colors.blue}
-                    onPress={disable ? () => {} : handleSaveReportTask}
-                  />
-                  <Trash
-                    variant="Bold"
-                    size={sizes.extraTitle}
-                    color={colors.red}
-                    onPress={() => setIsVisibleDeleteModal(true)}
-                  />
-                </>
-              )}
-            </RowComponent>
-          }
-        />
-      </SectionComponent>
+                    <FontAwesome5
+                      name="share-alt"
+                      size={sizes.bigTitle}
+                      color={colors.blue}
+                      onPress={shareFileLink}
+                    />
+                  </>
+                )}
+                {report.status === 'pending' && (
+                  <>
+                    {user?.role === 'admin' && (
+                      <ArchiveTick
+                        variant="Bold"
+                        size={sizes.extraTitle}
+                        color={colors.green}
+                        onPress={handleApproved}
+                      />
+                    )}
+                    <Entypo
+                      name="save"
+                      size={sizes.extraTitle}
+                      color={disable ? colors.gray2 : colors.blue}
+                      onPress={disable ? () => { } : handleSaveReportTask}
+                    />
+                    <Trash
+                      variant="Bold"
+                      size={sizes.extraTitle}
+                      color={colors.red}
+                      onPress={() => setIsVisibleDeleteModal(true)}
+                    />
+                  </>
+                )}
+              </RowComponent>
+            }
+          />
+        </SectionComponent>
 
-      <DeleteModal
-        data={{
-          id: report.id,
-          type: 'reportPending',
-          itemTasks: reportTasks,
-        }}
-        visible={isVisibleDeleteModal}
-        onClose={() => setIsVisibleDeleteModal(false)}
-      />
-      <CommentModal
-        visible={isVisibleCommentModal}
-        disable={disable}
-        onClose={() => setIsVisibleCommentModal(false)}
-        value={text}
-        comment={report.comment}
-        onChange={val => setText(val)}
-        handleSaveComment={handleSaveComment}
-      />
-      <SpinnerComponent loading={isLoading} />
-    </Container>
+        <DeleteModal
+          data={{
+            id: report.id,
+            type: 'reportPending',
+            itemTasks: reportTasks,
+          }}
+          visible={isVisibleDeleteModal}
+          onClose={() => setIsVisibleDeleteModal(false)}
+        />
+        <CommentModal
+          visible={isVisibleCommentModal}
+          disable={disable}
+          onClose={() => setIsVisibleCommentModal(false)}
+          value={text}
+          comment={report.comment}
+          onChange={val => setText(val)}
+          handleSaveComment={handleSaveComment}
+        />
+        <SpinnerComponent loading={isLoading} />
+      </Container>
+    </SafeAreaView>
   );
 };
 

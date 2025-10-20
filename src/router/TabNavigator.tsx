@@ -20,14 +20,16 @@ import { colors } from '../constants/colors';
 import { fontFamillies } from '../constants/fontFamilies';
 import { sizes } from '../constants/sizes';
 import { useCartStore } from '../zustand/store';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TabNavigator = () => {
   const Tab = createBottomTabNavigator();
+  const insets = useSafeAreaInsets()
   const { carts } = useCartStore()
 
   const tabBarIcon = ({ focused, size, color, route }: any) => {
     color = focused ? colors.textBold : colors.text;
-    size = sizes.smallTitle;
+    size = sizes.title;
     let icon = <TargetSvg width={size} height={size} color={color} />;
     let title;
 
@@ -131,6 +133,9 @@ const TabNavigator = () => {
           paddingTop: 8,
           justifyContent: 'space-around',
           alignItems: 'center',
+          height: 70 + insets.bottom,
+          paddingBottom: insets.bottom,
+          position:'absolute'
         },
         tabBarIcon: ({ focused, size, color }: any) =>
           tabBarIcon({ focused, size, color, route }),
@@ -152,6 +157,5 @@ const localStyle = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     width: 200,
-    // backgroundColor:'coral'
   },
 });

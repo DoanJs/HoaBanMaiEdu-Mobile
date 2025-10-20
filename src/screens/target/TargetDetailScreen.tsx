@@ -34,9 +34,11 @@ import {
   useTargetStore,
   useUserStore,
 } from '../../zustand/store';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TargetDetailScreen = ({ navigation, route }: any) => {
   const { field } = route.params;
+  const insets = useSafeAreaInsets()
   const { user } = useUserStore();
   const { child } = useChildStore();
   const { targets, setTargets } = useTargetStore();
@@ -101,104 +103,98 @@ const TargetDetailScreen = ({ navigation, route }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <Container
-      bg={colors.primaryLight}
-      back
-      title={child.fullName}
-      uri={child.avatar}
-      right={
-        <Profile2User
-          size={sizes.title}
-          color={colors.textBold}
-          variant="Bold"
-          onPress={() => navigation.navigate('ChildrenScreen')}
-        />
-      }
-    >
-      <SectionComponent
-        styles={{ backgroundColor: colors.background, flex: 1 }}
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <Container
+        bg={colors.primaryLight}
+        back
+        title={child.fullName}
+        uri={child.avatar}
       >
-        <SpaceComponent height={10} />
-        <RowComponent justify="space-between">
-          <RowComponent>
-            {showUIIconTarget(field.name, sizes.bigTitle, sizes.bigTitle)}
-            <SpaceComponent width={8} />
-            <TextComponent
-              text={field.name.toUpperCase()}
-              size={sizes.text}
-              font={fontFamillies.poppinsBold}
-            />
-            <TextComponent
-              text={` (${targetsNew.length})`}
-              size={sizes.smallText}
-            />
-          </RowComponent>
-          <RowComponent>
-            <TickCircle
-              variant="Bold"
-              size={sizes.title}
-              color={
-                carts.filter(cart => cart.fieldId === field.id).length > 0
-                  ? colors.green
-                  : colors.gray
-              }
-            />
-            <TextComponent
-              text={` (${
-                carts.filter(cart => cart.fieldId === field.id).length
-              })`}
-              size={sizes.smallText}
-            />
-          </RowComponent>
-        </RowComponent>
-
-        <RowComponent
-          justify="space-between"
-          styles={{
-            paddingVertical: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.textBold,
-            alignItems: 'center',
-          }}
+        <SectionComponent
+          styles={{ backgroundColor: colors.background, flex: 1 }}
         >
-          <View style={{ flex: 1 }}>
-            <SearchComponent
-              arrSource={targetsField}
-              onChange={val => setTargetsNew(val)}
-              placeholder="Nhập mục tiêu"
-              type="searchTarget"
+          <SpaceComponent height={10} />
+          <RowComponent justify="space-between">
+            <RowComponent>
+              {showUIIconTarget(field.name, sizes.bigTitle, sizes.bigTitle)}
+              <SpaceComponent width={8} />
+              <TextComponent
+                text={field.name.toUpperCase()}
+                size={sizes.text}
+                font={fontFamillies.poppinsBold}
+              />
+              <TextComponent
+                text={` (${targetsNew.length})`}
+                size={sizes.smallText}
+              />
+            </RowComponent>
+            <RowComponent>
+              <TickCircle
+                variant="Bold"
+                size={sizes.title}
+                color={
+                  carts.filter(cart => cart.fieldId === field.id).length > 0
+                    ? colors.green
+                    : colors.gray
+                }
+              />
+              <TextComponent
+                text={` (${carts.filter(cart => cart.fieldId === field.id).length
+                  })`}
+                size={sizes.smallText}
+              />
+            </RowComponent>
+          </RowComponent>
+
+          <RowComponent
+            justify="space-between"
+            styles={{
+              paddingVertical: 10,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.textBold,
+              alignItems: 'center',
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <SearchComponent
+                arrSource={targetsField}
+                onChange={val => setTargetsNew(val)}
+                placeholder="Nhập mục tiêu"
+                type="searchTarget"
+              />
+            </View>
+
+            <SpaceComponent width={20} />
+
+            <ArrowRotateLeft
+              size={sizes.title}
+              color={colors.red}
+              onPress={handleRemoveSelect}
             />
-          </View>
+          </RowComponent>
 
-          <SpaceComponent width={20} />
+          <SpaceComponent height={8} />
 
-          <ArrowRotateLeft
-            size={sizes.title}
-            color={colors.red}
-            onPress={handleRemoveSelect}
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{paddingBottom: insets.bottom + 80}}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            data={targetsNew.sort((a, b) => a.level - b.level)}
+            renderItem={({ item }) => (
+              <TargetItemComponent
+                key={item.id}
+                target={item}
+                setIsLoading={setIsLoading}
+                planTasks={planTasks}
+              />
+            )}
           />
-        </RowComponent>
-
-        <SpaceComponent height={8} />
-
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          data={targetsNew.sort((a, b) => a.level - b.level)}
-          renderItem={({ item }) => (
-            <TargetItemComponent
-              key={item.id}
-              target={item}
-              setIsLoading={setIsLoading}
-              planTasks={planTasks}
-            />
-          )}
-        />
-      </SectionComponent>
-      <SpinnerComponent loading={isLoading} />
-    </Container>
+        </SectionComponent>
+        <SpinnerComponent loading={isLoading} />
+      </Container>
+    </SafeAreaView>
   );
 };
 

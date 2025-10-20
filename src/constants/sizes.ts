@@ -4,6 +4,9 @@ export const sizes = {
   width: Dimensions.get('window').width,
   height: Dimensions.get('window').height,
 
+  header: 40,
+  smallHeader: 36,
+
   extraTitle: 30,
   bigTitle: 28,
   title: 26,

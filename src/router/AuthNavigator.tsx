@@ -13,13 +13,6 @@ const AuthNavigator = () => {
             <Stack.Screen name="AuthHomeScreen" component={AuthHomeScreen} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
-            {/* <Stack.Screen
-        name="ForgotPasswordScreen"
-        component={ForgotPasswordScreen}
-      />
-      <Stack.Screen name="VerifyNumberScreen" component={VerifyNumberScreen} />
-      <Stack.Screen name="OTPScreen" component={OTPScreen} /> */}
-            {/* <Stack.Screen name='Main' component={TabNavigator} /> */}
         </Stack.Navigator>
     );
 };
