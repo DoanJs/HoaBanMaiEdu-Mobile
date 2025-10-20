@@ -12,7 +12,20 @@
           "package_name": "com.hoabanmaiedu"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "465303174037-5q756e1duan2992hftfhsugj7igotkd1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hoabanmaiedu",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "465303174037-nh9lg3upnppj6ncrnch1i19avilm5v4f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB3dusUvTsKretXGYBt4Rh4GKifo9xHaQg"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "465303174037-nh9lg3upnppj6ncrnch1i19avilm5v4f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "465303174037-53jimecvovfpkcinhv6v5leka1il2j93.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.HoaBanMaiEdu"
+              }
+            }
+          ]
         }
       }
     }

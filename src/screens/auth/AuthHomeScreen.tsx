@@ -14,11 +14,11 @@ import { colors } from '../../constants/colors';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { sizes } from '../../constants/sizes';
 import { SafeAreaView } from 'react-native-safe-area-context';
-// import { signInWithGoogle } from '../../../firebase.config';
+import { signInWithGoogle } from '../../../firebase.config';
 
 const AuthHomeScreen = ({ navigation }: any) => {
   const handleLoginGoolgle = () => {
-    // signInWithGoogle()
+    signInWithGoogle()
   };
   return (
     <SafeAreaView style={{flex: 1}} edges={['bottom']}>

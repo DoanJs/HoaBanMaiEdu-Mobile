@@ -3,6 +3,7 @@
 import { getApp } from '@react-native-firebase/app';
 import {
   createUserWithEmailAndPassword,
+  FirebaseAuthTypes,
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged,
@@ -15,6 +16,8 @@ import {
   doc,
   getDoc,
   getFirestore,
+  serverTimestamp,
+  setDoc,
   updateDoc,
 } from '@react-native-firebase/firestore';
 // import {
@@ -25,10 +28,10 @@ import {
 //   onMessage,
 //   requestPermission,
 // } from '@react-native-firebase/messaging';
-// import {
-//   GoogleSignin,
-//   SignInResponse,
-// } from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  SignInResponse,
+} from '@react-native-google-signin/google-signin';
 // import { Linking, PermissionsAndroid, Platform } from 'react-native';
 // import Logo from './src/assets/images/logo.png';
 
@@ -37,31 +40,31 @@ const db = getFirestore();
 const app = getApp();
 // const messaging = getMessaging(app);
 
-// GoogleSignin.configure({
-//   webClientId:
-//     '225425706491-qd8o8iftv938l2c9onale56v0p4crm7c.apps.googleusercontent.com',
-// });
+GoogleSignin.configure({
+  webClientId:
+    '465303174037-nh9lg3upnppj6ncrnch1i19avilm5v4f.apps.googleusercontent.com',
+});
 
-// const signInWithGoogle = async () => {
-//   // B1: clear session cũ
-//   // await GoogleSignin.signOut();
-//   // await GoogleSignin.revokeAccess();
-//   // await signOut(auth);
+const signInWithGoogle = async () => {
+  // B1: clear session cũ
+  // await GoogleSignin.signOut();
+  // await GoogleSignin.revokeAccess();
+  // await signOut(auth);
 
-//   // // B2: đảm bảo Google Play Services ok
-//   await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+  // // B2: đảm bảo Google Play Services ok
+  await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
 
-//   // Step 1 - Google sign in (OAuth)
-//   const userInfo: SignInResponse = await GoogleSignin.signIn();
+  // Step 1 - Google sign in (OAuth)
+  const userInfo: SignInResponse = await GoogleSignin.signIn();
 
-//   // Step 2 - Create a Google credential with the token
-//   const googleCredential = GoogleAuthProvider.credential(
-//     userInfo.data?.idToken,
-//   );
+  // Step 2 - Create a Google credential with the token
+  const googleCredential = GoogleAuthProvider.credential(
+    userInfo.data?.idToken,
+  );
 
-//   // Step 3 - Sign-in the user to Firebase with the credential
-//   return signInWithCredential(auth, googleCredential);
-// };
+  // Step 3 - Sign-in the user to Firebase with the credential
+  return signInWithCredential(auth, googleCredential);
+};
 
 // /**
 //  * Xin quyền nhận thông báo (Android 13+ và iOS)
@@ -170,15 +173,15 @@ const app = getApp();
 
 export {
   auth,
-//   checkInitialNotification,
+  //   checkInitialNotification,
   createUserWithEmailAndPassword,
   db,
-//   getFCMToken,
-//   listenForegroundMessages,
-//   messaging,
+  //   getFCMToken,
+  //   listenForegroundMessages,
+  //   messaging,
   onAuthStateChanged,
-//   requestUserPermission,
+  //   requestUserPermission,
   signInWithEmailAndPassword,
-//   signInWithGoogle,
+  signInWithGoogle,
   signOut,
 };

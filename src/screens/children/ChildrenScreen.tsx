@@ -38,6 +38,7 @@ import {
 } from '../../zustand/store';
 import ChildItemComponent from './ChildItemComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 // const children = [
 //   {
@@ -226,7 +227,8 @@ const ChildrenScreen = () => {
     setIsLoading(true);
 
     await signOut(auth);
-
+    await GoogleSignin.signOut();
+    await GoogleSignin.revokeAccess()
     setIsLoading(false);
   };
 

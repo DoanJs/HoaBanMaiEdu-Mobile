@@ -70,7 +70,7 @@ const Register = ({ navigation }: any) => {
               email: email,
               fullName: fullName,
               shortName: fullName,
-              avatar: "",
+              avatar: "https://cdn.pixabay.com/photo/2019/10/30/16/19/fox-4589927_1280.jpg",
               phone: phone,
               birth: serverTimestamp(),
               role: "teacher",
