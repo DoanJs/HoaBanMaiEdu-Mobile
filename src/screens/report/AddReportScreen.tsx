@@ -1,6 +1,7 @@
 import { serverTimestamp, where } from '@react-native-firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, TouchableOpacity } from 'react-native';
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ButtonComponent,
@@ -173,7 +174,10 @@ const AddReportScreen = ({ navigation }: any) => {
           <SpaceComponent height={10} />
 
           {planSelected && (
-            <FlatList
+            <KeyboardAwareFlatList
+              keyboardShouldPersistTaps='handled'
+              enableOnAndroid={true}
+              extraScrollHeight={100}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
               data={hanldeGroupPlanWithField(addReports)}

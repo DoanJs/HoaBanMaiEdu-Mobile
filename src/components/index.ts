@@ -5,6 +5,7 @@ import CheckedButtonComponent from './CheckedButtonComponent';
 import Container from './Container';
 import Header from './Header';
 import InputComponent from './InputComponent';
+import KeyboardAwareScrollViewComponent from './KeyboardAwareScrollViewComponent';
 import RowComponent from './RowComponent';
 import SearchComponent from './SearchComponent';
 import SectionComponent from './SectionComponent';
@@ -15,6 +16,7 @@ import TargetItemComponent from './TargetItemComponent';
 import TextComponent from './TextComponent';
 
 export {
+  KeyboardAwareScrollViewComponent,
   BtnShadowLinearComponent,
   ButtonComponent,
   CartItemComponent,

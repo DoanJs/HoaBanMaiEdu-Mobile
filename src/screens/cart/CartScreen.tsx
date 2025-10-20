@@ -5,14 +5,16 @@ import {
   serverTimestamp,
   where,
 } from '@react-native-firebase/firestore';
-import { AddCircle, Profile2User } from 'iconsax-react-native';
+import { AddCircle } from 'iconsax-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  FlatList,
   RefreshControl,
-  TouchableOpacity,
+  TouchableOpacity
 } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../../firebase.config';
 import {
   ButtonComponent,
@@ -43,8 +45,6 @@ import {
   usePlanStore,
   useUserStore,
 } from '../../zustand/store';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const CartScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets()
@@ -292,9 +292,12 @@ const CartScreen = ({ navigation }: any) => {
               <SpaceComponent height={10} />
 
               <GestureHandlerRootView>
-                <FlatList
+                <KeyboardAwareFlatList
+                  keyboardShouldPersistTaps='handled'
+                  enableOnAndroid={true}
+                  extraScrollHeight={100}
                   showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{paddingBottom: insets.bottom + 80}}
+                  contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
                   data={groupArrayWithField(carts, 'fieldId')}
                   refreshControl={
                     <RefreshControl

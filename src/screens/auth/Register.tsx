@@ -20,6 +20,7 @@ import { auth, createUserWithEmailAndPassword } from '../../../firebase.config';
 import {
   BtnShadowLinearComponent,
   InputComponent,
+  KeyboardAwareScrollViewComponent,
   RowComponent,
   SectionComponent,
   SpaceComponent,
@@ -127,7 +128,7 @@ const Register = ({ navigation }: any) => {
             borderRadius: 10,
           }}
         >
-          <SectionComponent>
+          <KeyboardAwareScrollViewComponent>
             <TextComponent
               text="Create account"
               font={fontFamillies.poppinsSemiBold}
@@ -243,7 +244,7 @@ const Register = ({ navigation }: any) => {
                 />
               </TouchableOpacity>
             </RowComponent>
-          </SectionComponent>
+          </KeyboardAwareScrollViewComponent>
         </View>
       </ImageBackground>
     </SafeAreaView>

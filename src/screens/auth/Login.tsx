@@ -12,6 +12,7 @@ import {
   BtnShadowLinearComponent,
   CheckedButtonComponent,
   InputComponent,
+  KeyboardAwareScrollViewComponent,
   RowComponent,
   SectionComponent,
   SpaceComponent,
@@ -21,6 +22,7 @@ import { colors } from '../../constants/colors';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { sizes } from '../../constants/sizes';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }: any) => {
@@ -98,7 +100,7 @@ const Login = ({ navigation }: any) => {
             borderRadius: 10,
           }}
         >
-          <SectionComponent>
+          <KeyboardAwareScrollViewComponent>
             <TextComponent
               text="Welcome back !"
               font={fontFamillies.poppinsSemiBold}
@@ -112,7 +114,6 @@ const Login = ({ navigation }: any) => {
             />
 
             <SpaceComponent height={16} />
-
             <InputComponent
               styles={{
                 backgroundColor: colors.background,
@@ -210,7 +211,8 @@ const Login = ({ navigation }: any) => {
                 />
               </TouchableOpacity>
             </RowComponent>
-          </SectionComponent>
+
+          </KeyboardAwareScrollViewComponent>
         </View>
       </ImageBackground>
     </SafeAreaView>

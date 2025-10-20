@@ -46,6 +46,7 @@ import {
 } from '../../zustand/store';
 import ReportItemComponent from './ReportItemComponent';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 
 const ReportDetailScreen = ({ navigation, route }: any) => {
   const { report } = route.params;
@@ -310,9 +311,12 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
               styles={{ fontStyle: 'italic' }}
             />
           </RowComponent>
-          <FlatList
+          <KeyboardAwareFlatList
+            keyboardShouldPersistTaps='handled'
+            enableOnAndroid={true}
+            extraScrollHeight={100}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: insets.bottom + 80}}
+            contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
             data={handleGroupReportWithField(reportTasks)}
             renderItem={({ item, index }) => (
               <ReportItemComponent
