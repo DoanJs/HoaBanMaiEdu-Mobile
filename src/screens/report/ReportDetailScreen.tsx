@@ -345,7 +345,7 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
                     />
                     <FontAwesome5
                       name="share-alt"
-                      size={sizes.bigTitle}
+                      size={sizes.extraTitle}
                       color={colors.blue}
                       onPress={shareFileLink}
                     />

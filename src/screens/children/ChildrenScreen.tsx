@@ -1,13 +1,14 @@
 import { QueryConstraint, where } from '@react-native-firebase/firestore';
 import { Logout } from 'iconsax-react-native';
 import React, { useEffect, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ActivityIndicator, ScrollView } from 'react-native';
 import { auth, signOut } from '../../../firebase.config';
 import {
   Container,
   RowComponent,
   SearchComponent,
   SectionComponent,
+  SpinnerComponent,
 } from '../../components';
 import { colors } from '../../constants/colors';
 import { getDocData } from '../../constants/firebase/getDocData';
@@ -249,6 +250,7 @@ const ChildrenScreen = () => {
   //     .catch(error => console.log(error));
   // };
 
+  if(!user) return <ActivityIndicator />
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Container
@@ -289,6 +291,8 @@ const ChildrenScreen = () => {
             </RowComponent>
           </ScrollView>
         </SectionComponent>
+        
+        <SpinnerComponent loading={isLoading}/>
       </Container>
     </SafeAreaView>
   );

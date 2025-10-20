@@ -283,7 +283,7 @@ const CartScreen = ({ navigation }: any) => {
                 <SpaceComponent width={20} />
                 <AddCircle
                   onPress={() => navigation.navigate('Target')}
-                  size={sizes.title}
+                  size={sizes.bigTitle}
                   color={colors.primary}
                   variant="Bold"
                 />

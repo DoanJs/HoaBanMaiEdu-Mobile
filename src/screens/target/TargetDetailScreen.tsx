@@ -131,7 +131,7 @@ const TargetDetailScreen = ({ navigation, route }: any) => {
             <RowComponent>
               <TickCircle
                 variant="Bold"
-                size={sizes.title}
+                size={sizes.bigTitle}
                 color={
                   carts.filter(cart => cart.fieldId === field.id).length > 0
                     ? colors.green
@@ -142,6 +142,12 @@ const TargetDetailScreen = ({ navigation, route }: any) => {
                 text={` (${carts.filter(cart => cart.fieldId === field.id).length
                   })`}
                 size={sizes.smallText}
+              />
+              <SpaceComponent width={20}/>
+              <ArrowRotateLeft
+                size={sizes.bigTitle}
+                color={colors.red}
+                onPress={handleRemoveSelect}
               />
             </RowComponent>
           </RowComponent>
@@ -163,21 +169,13 @@ const TargetDetailScreen = ({ navigation, route }: any) => {
                 type="searchTarget"
               />
             </View>
-
-            <SpaceComponent width={20} />
-
-            <ArrowRotateLeft
-              size={sizes.title}
-              color={colors.red}
-              onPress={handleRemoveSelect}
-            />
           </RowComponent>
 
           <SpaceComponent height={8} />
 
           <FlatList
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: insets.bottom + 80}}
+            contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }

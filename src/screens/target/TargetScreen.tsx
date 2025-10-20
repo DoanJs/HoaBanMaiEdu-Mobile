@@ -7,10 +7,10 @@ import { getDocsData } from '../../constants/firebase/getDocsData.ts';
 import { useChildStore, useFieldStore } from '../../zustand/store';
 import FieldItemComponent from './FieldItemComponent.tsx';
 
-const TargetScreen = ({ navigation }: any) => {
+const TargetScreen = () => {
+  const insets = useSafeAreaInsets()
   const { child } = useChildStore();
   const { fields, setFields } = useFieldStore();
-  const insets = useSafeAreaInsets()
   const [refreshing, setRefreshing] = useState(false); // loading khi kéo xuống
 
   const onRefresh = useCallback(async () => {
