@@ -232,6 +232,7 @@ const ChildrenScreen = () => {
     setIsLoading(false);
   };
 
+
   // const uploadData = async () => {
   //   // const data = firestoreData.Meta;
   //   const promiseItem = children.map(_ => {

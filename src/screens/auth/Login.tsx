@@ -202,7 +202,7 @@ const Login = ({ navigation }: any) => {
                 color={colors.text}
               />
               <SpaceComponent width={10} />
-              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
                 <TextComponent
                   text="Sign up"
                   color={colors.text}
