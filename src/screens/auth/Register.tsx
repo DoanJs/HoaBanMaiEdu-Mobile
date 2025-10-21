@@ -235,7 +235,7 @@ const Register = ({ navigation }: any) => {
                 color={colors.text}
               />
               <SpaceComponent width={10} />
-              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
                 <TextComponent
                   text="Login"
                   color={colors.text}

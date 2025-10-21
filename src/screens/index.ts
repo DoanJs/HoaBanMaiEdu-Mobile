@@ -1,4 +1,5 @@
 import AuthHomeScreen from "./auth/AuthHomeScreen";
+import ForgotPasswordScreen from "./auth/ForgotPasswordScreen";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
 import CartScreen from "./cart/CartScreen";
@@ -28,5 +29,6 @@ export {
     ChildrenScreen,
     Login,Register,
     AuthHomeScreen,
-    AddReportScreen
+    AddReportScreen,
+    ForgotPasswordScreen
 };

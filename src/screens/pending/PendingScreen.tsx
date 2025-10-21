@@ -40,6 +40,7 @@ const PendingScreen = ({ navigation }: any) => {
   const [reportNews, setReportNews] = useState<ReportModel[]>([]);
   const [refreshing, setRefreshing] = useState(false); // loading khi kéo xuống
 
+
   useEffect(() => {
     if (plans.length > 0) {
       setPlanNews(plans.filter(plan => plan.status === 'pending'));
@@ -51,6 +52,16 @@ const PendingScreen = ({ navigation }: any) => {
     }
   }, [reports]);
 
+  const isComments = (type: string) => {
+    let status = false
+    if (type === 'plans') {
+      status = plans.filter((plan) => plan.status === 'pending' && plan.comment !== '').length > 0
+    } else {
+      status = reports.filter((report) => report.status === 'pending' && report.comment !== '').length > 0
+    }
+
+    return status
+  }
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -99,8 +110,25 @@ const PendingScreen = ({ navigation }: any) => {
                   selected === 'Kế hoạch' ? 'coral' : colors.background,
                 padding: 10,
                 borderRadius: 10,
+                position: 'relative'
               }}
             >
+              {
+                isComments( 'plans') &&
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -10,
+                    right: 0,
+                  }}
+                >
+                  <MessageNotif
+                    color={colors.red}
+                    size={sizes.title}
+                    variant="Bold"
+                  />
+                </View>
+              }
               <TextComponent
                 text="Kế hoạch"
                 font={fontFamillies.poppinsBold}
@@ -114,8 +142,25 @@ const PendingScreen = ({ navigation }: any) => {
                   selected === 'Báo cáo' ? 'coral' : colors.background,
                 padding: 10,
                 borderRadius: 10,
+                position:'relative'
               }}
             >
+              {
+                isComments('reports') &&
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -10,
+                    right: 0,
+                  }}
+                >
+                  <MessageNotif
+                    color={colors.red}
+                    size={sizes.title}
+                    variant="Bold"
+                  />
+                </View>
+              }
               <TextComponent
                 text="Báo cáo"
                 font={fontFamillies.poppinsBold}
