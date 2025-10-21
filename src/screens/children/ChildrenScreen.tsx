@@ -1,7 +1,7 @@
 import { QueryConstraint, where } from '@react-native-firebase/firestore';
 import { Logout } from 'iconsax-react-native';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, RefreshControl, ScrollView } from 'react-native';
 import { auth, signOut } from '../../../firebase.config';
 import {
   Container,
@@ -39,6 +39,7 @@ import {
 import ChildItemComponent from './ChildItemComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { getDocsData } from '../../constants/firebase/getDocsData';
 
 // const children = [
 //   {
@@ -140,6 +141,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const ChildrenScreen = () => {
   const userServer = auth.currentUser;
+  const [refreshing, setRefreshing] = useState(false); // loading khi kéo xuống
   const [isLoading, setIsLoading] = useState(false);
   const { user, setUser } = useUserStore();
   const { children, setChildren } = useChildrenStore();
@@ -229,10 +231,21 @@ const ChildrenScreen = () => {
     await signOut(auth);
     await GoogleSignin.signOut();
     await GoogleSignin.revokeAccess()
-    
+
     setIsLoading(false);
   };
-
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      getDocsData({
+        nameCollect: 'children',
+        condition: [where('teacherIds', 'array-contains', user?.id)],
+        setData: setChildren,
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   // const uploadData = async () => {
   //   // const data = firestoreData.Meta;
@@ -254,7 +267,7 @@ const ChildrenScreen = () => {
   //     .catch(error => console.log(error));
   // };
 
-  if(!user) return <ActivityIndicator />
+  if (!user) return <ActivityIndicator />
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Container
@@ -286,7 +299,11 @@ const ChildrenScreen = () => {
             placeholder="Nhập tên trẻ"
             type="searchChild"
           />
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
             <RowComponent justify="space-around" styles={{ flexWrap: 'wrap' }}>
               {children.length > 0 &&
                 children.map((_, index) => (
@@ -295,8 +312,8 @@ const ChildrenScreen = () => {
             </RowComponent>
           </ScrollView>
         </SectionComponent>
-        
-        <SpinnerComponent loading={isLoading}/>
+
+        <SpinnerComponent loading={isLoading} />
       </Container>
     </SafeAreaView>
   );
