@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   CartNavigator,
   PendingNavigator,
@@ -20,8 +21,6 @@ import { colors } from '../constants/colors';
 import { fontFamillies } from '../constants/fontFamilies';
 import { sizes } from '../constants/sizes';
 import { useCartStore, usePlanStore, useReportStore } from '../zustand/store';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PlanModel } from '../models';
 
 const TabNavigator = () => {
   const Tab = createBottomTabNavigator();
@@ -40,7 +39,6 @@ const TabNavigator = () => {
     }
   }, [plans, reports])
 
-  console.log(reports)
   const tabBarIcon = ({ focused, size, color, route }: any) => {
     color = focused ? colors.textBold : colors.text;
     size = sizes.title;
@@ -70,7 +68,7 @@ const TabNavigator = () => {
               }}
             />
           }
-          <PendingSvg width={size} height={size} color={color} />;
+          <PendingSvg width={size} height={size} color={color} />
         </View>;
         title = (
           <TextComponent
