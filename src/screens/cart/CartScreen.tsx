@@ -251,7 +251,7 @@ const CartScreen = ({ navigation }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['bottom']}>
       <Container
         bg={colors.primaryLight}
         title={child.fullName}

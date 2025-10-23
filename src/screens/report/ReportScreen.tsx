@@ -43,7 +43,10 @@ const ReportScreen = ({ navigation }: any) => {
     try {
       getDocsData({
         nameCollect: 'reports',
-        condition: [where('teacherIds', 'array-contains', user?.id)],
+        condition: [
+          where('teacherIds', 'array-contains', user?.id),
+          where('childId', '==', child?.id)
+        ],
         setData: setReports,
       });
     } finally {

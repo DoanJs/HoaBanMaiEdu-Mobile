@@ -143,10 +143,9 @@ const AddReportScreen = ({ navigation }: any) => {
     );
   };
 
-  console.log(addReports);
   if (!child) return <ActivityIndicator />;
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 , backgroundColor: colors.background}} edges={['bottom']}>
       <Container
         back
         bg={colors.primaryLight}

@@ -4,6 +4,7 @@ import Modal from 'react-native-modal';
 import { InputComponent } from '..';
 import { colors } from '../../constants/colors';
 import { useUserStore } from '../../zustand/store';
+import { fontFamillies } from '../../constants/fontFamilies';
 
 interface Props {
   visible: boolean;
@@ -64,6 +65,7 @@ export default function CommentModal(props: Props) {
             color: colors.text,
             textAlignVertical: 'top',
             minHeight: '40%',
+            fontFamily: fontFamillies.poppinsRegular
           }}
           onChange={val => onChange(val)}
         />
@@ -80,11 +82,11 @@ export default function CommentModal(props: Props) {
             <TouchableOpacity
               onPress={
                 disable
-                  ? () => {}
+                  ? () => { }
                   : () => {
-                      handleSaveComment();
-                      onClose();
-                    }
+                    handleSaveComment();
+                    onClose();
+                  }
               }
               style={[
                 styles.button,

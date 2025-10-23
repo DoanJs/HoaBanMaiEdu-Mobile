@@ -17,6 +17,7 @@ import {
   Container,
   RowComponent,
   SectionComponent,
+  SpaceComponent,
   SpinnerComponent,
   TextComponent,
 } from '../../components';
@@ -42,6 +43,7 @@ import {
 } from '../../zustand/store';
 import PlanItemComponent from './PlanItemComponent';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 
 const PlanDetailScreen = ({ navigation, route }: any) => {
   const { plan } = route.params;
@@ -199,7 +201,7 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['bottom']}>
       <Container
         back
         bg={colors.primaryLight}
@@ -233,33 +235,38 @@ const PlanDetailScreen = ({ navigation, route }: any) => {
                   onPress={() => setIsVisibleCommentModal(true)}
                 />
               )}
-            {convertTimeStampFirestore(plan?.createAt) !==
-              convertTimeStampFirestore(plan?.updateAt) ? (
-              <TextComponent
-                styles={{ fontStyle: 'italic' }}
-                text={`Cập nhật: ${moment(
-                  convertTimeStampFirestore(plan?.updateAt),
-                ).format('HH:mm:ss DD/MM/YYYY')}`}
-                size={sizes.smallText}
-              />
-            ) : (
-              <TextComponent
-                styles={{ fontStyle: 'italic' }}
-                text={`Gửi lên: ${moment(
-                  convertTimeStampFirestore(plan?.createAt),
-                ).format('HH:mm:ss_DD/MM/YYYY')}`}
-                size={sizes.smallText}
-              />
-            )}
             <TextComponent
               text={plan.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
-              size={sizes.smallText}
+              size={sizes.extraComment}
               styles={{ fontStyle: 'italic' }}
             />
           </RowComponent>
-          <FlatList
+          <RowComponent justify="space-between">
+            <TextComponent
+              styles={{ fontStyle: 'italic' }}
+              text={`Gửi lên: ${moment(
+                convertTimeStampFirestore(plan?.createAt),
+              ).format('HH:mm:ss_DD/MM/YYYY')}`}
+              size={sizes.extraComment}
+            />
+            {convertTimeStampFirestore(plan?.createAt) !==
+              convertTimeStampFirestore(plan?.updateAt) && (
+                <TextComponent
+                  styles={{ fontStyle: 'italic' }}
+                  text={`Cập nhật: ${moment(
+                    convertTimeStampFirestore(plan?.updateAt),
+                  ).format('HH:mm:ss DD/MM/YYYY')}`}
+                  size={sizes.extraComment}
+                />
+              )}
+          </RowComponent>
+
+          <SpaceComponent height={8} />
+
+          <KeyboardAwareFlatList
+            keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: insets.bottom + 80}}
+            contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
             data={hanldeGroupPlanWithField(planTasks)}
             renderItem={({ item, index }) => (
               <PlanItemComponent key={item.id} planTask={item} index={index} />

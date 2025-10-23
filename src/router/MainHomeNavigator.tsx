@@ -66,7 +66,7 @@ const MainHomeNavigator = () => {
   useEffect(() => {
     if (!loading_reports) {
       const items = data_reports as ReportModel[];
-      setReports(items.filter(plan => plan.childId === child?.id));
+      setReports(items.filter(report => report.childId === child?.id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data_reports, loading_reports]);

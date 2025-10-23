@@ -269,7 +269,7 @@ const ChildrenScreen = () => {
 
   if (!user) return <ActivityIndicator />
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['bottom']} >
       <Container
         bg={colors.primaryLight}
         uri={user?.avatar}

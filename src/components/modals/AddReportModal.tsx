@@ -9,8 +9,8 @@ import {
 import Modal from 'react-native-modal';
 import { colors } from '../../constants/colors';
 import { fontFamillies } from '../../constants/fontFamilies';
-import { usePlanStore } from '../../zustand/store';
 import { PlanModel } from '../../models';
+import { usePlanStore } from '../../zustand/store';
 
 interface Props {
   visible: boolean;
@@ -26,7 +26,7 @@ export default function AddReportModal(props: Props) {
 
   useEffect(() => {
     if (planSelected) {
-      setSelected(planSelected.title);
+      setSelected(planSelected.id);
     }
   }, [planSelected]);
 
@@ -42,9 +42,9 @@ export default function AddReportModal(props: Props) {
         style={[
           styles.itemContent,
           {
-            color: selected === item.title ? colors.green : '#333',
+            color: selected === item.id ? colors.green : '#333',
             fontFamily:
-              selected === item.title
+              selected === item.id
                 ? fontFamillies.poppinsBold
                 : fontFamillies.poppinsRegular,
           },

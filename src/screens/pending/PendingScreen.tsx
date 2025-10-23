@@ -1,5 +1,5 @@
 import { where } from '@react-native-firebase/firestore';
-import { MessageNotif, Profile2User } from 'iconsax-react-native';
+import { MessageNotif } from 'iconsax-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Container,
   RowComponent,
@@ -27,7 +28,6 @@ import {
   useReportStore,
   useUserStore,
 } from '../../zustand/store';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const PendingScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets()
@@ -67,12 +67,18 @@ const PendingScreen = ({ navigation }: any) => {
     try {
       getDocsData({
         nameCollect: 'plans',
-        condition: [where('teacherIds', 'array-contains', user?.id)],
+        condition: [
+          where('teacherIds', 'array-contains', user?.id),
+          where('childId', '==', child?.id)
+        ],
         setData: setPlans,
       });
       getDocsData({
         nameCollect: 'reports',
-        condition: [where('teacherIds', 'array-contains', user?.id)],
+        condition: [
+          where('teacherIds', 'array-contains', user?.id),
+          where('childId', '==', child?.id)
+        ],
         setData: setReports,
       });
     } finally {
@@ -82,7 +88,7 @@ const PendingScreen = ({ navigation }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['bottom']}>
       <Container
         bg={colors.primaryLight}
         title={child.fullName}
@@ -114,7 +120,7 @@ const PendingScreen = ({ navigation }: any) => {
               }}
             >
               {
-                isComments( 'plans') &&
+                isComments('plans') &&
                 <View
                   style={{
                     position: 'absolute',
@@ -142,7 +148,7 @@ const PendingScreen = ({ navigation }: any) => {
                   selected === 'Báo cáo' ? 'coral' : colors.background,
                 padding: 10,
                 borderRadius: 10,
-                position:'relative'
+                position: 'relative'
               }}
             >
               {

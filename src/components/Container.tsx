@@ -62,7 +62,7 @@ const Container = (props: Props) => {
               <Image
                 style={{
                   height: sizes.header,
-                  width: sizes.smallHeader,
+                  width: sizes.header,
                   borderRadius: 100,
                   resizeMode: 'cover',
                 }}

@@ -37,7 +37,10 @@ const PlanScreen = ({ navigation }: any) => {
     try {
       getDocsData({
         nameCollect: 'plans',
-        condition: [where('teacherIds', 'array-contains', user?.id)],
+        condition: [
+          where('teacherIds', 'array-contains', user?.id),
+          where('childId', '==', child?.id)
+        ],
         setData: setPlans,
       });
     } finally {

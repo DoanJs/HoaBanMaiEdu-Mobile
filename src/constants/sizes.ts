@@ -18,4 +18,8 @@ export const sizes = {
   text: 16,
   subText: 14,
   smallText: 12,
+
+  extraComment: 10,
+  bigComment: 8,
+  comment: 6,
 };

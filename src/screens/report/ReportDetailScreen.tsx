@@ -23,6 +23,7 @@ import {
   Container,
   RowComponent,
   SectionComponent,
+  SpaceComponent,
   SpinnerComponent,
   TextComponent,
 } from '../../components';
@@ -254,7 +255,7 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['bottom']}>
       <Container
         back
         bg={colors.primaryLight}
@@ -287,30 +288,35 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
                   onPress={() => setIsVisibleCommentModal(true)}
                 />
               )}
-            {convertTimeStampFirestore(report?.createAt) !==
-              convertTimeStampFirestore(report?.updateAt) ? (
-              <TextComponent
-                styles={{ fontStyle: 'italic' }}
-                text={`Cập nhật: ${moment(
-                  convertTimeStampFirestore(report?.updateAt),
-                ).format('HH:mm:ss DD/MM/YYYY')}`}
-                size={sizes.smallText}
-              />
-            ) : (
-              <TextComponent
-                styles={{ fontStyle: 'italic' }}
-                text={`Gửi lên: ${moment(
-                  convertTimeStampFirestore(report?.createAt),
-                ).format('HH:mm:ss_DD/MM/YYYY')}`}
-                size={sizes.smallText}
-              />
-            )}
             <TextComponent
               text={report.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt'}
-              size={sizes.smallText}
+              size={sizes.extraComment}
               styles={{ fontStyle: 'italic' }}
             />
           </RowComponent>
+
+          <RowComponent justify="space-between">
+            <TextComponent
+              styles={{ fontStyle: 'italic' }}
+              text={`Gửi lên: ${moment(
+                convertTimeStampFirestore(report?.createAt),
+              ).format('HH:mm:ss_DD/MM/YYYY')}`}
+              size={sizes.extraComment}
+            />
+            {convertTimeStampFirestore(report?.createAt) !==
+              convertTimeStampFirestore(report?.updateAt) && (
+                <TextComponent
+                  styles={{ fontStyle: 'italic' }}
+                  text={`Cập nhật: ${moment(
+                    convertTimeStampFirestore(report?.updateAt),
+                  ).format('HH:mm:ss DD/MM/YYYY')}`}
+                  size={sizes.extraComment}
+                />
+              )}
+          </RowComponent>
+
+          <SpaceComponent height={8}/>
+
           <KeyboardAwareFlatList
             keyboardShouldPersistTaps='handled'
             enableOnAndroid={true}

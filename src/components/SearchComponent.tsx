@@ -82,6 +82,7 @@ export default function SearchComponent(props: Props) {
         value={value}
         onChange={val => setValue(val)}
         placeholder={placeholder}
+        allowClear
       />
     </View>
   );
