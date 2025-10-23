@@ -2,7 +2,10 @@ import { serverTimestamp, where } from '@react-native-firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import {
   ButtonComponent,
   Container,
@@ -16,12 +19,14 @@ import { AddReportModal } from '../../components/modals';
 import { colors } from '../../constants/colors';
 import { convertTargetField } from '../../constants/convertTargetAndField';
 import { addDocData } from '../../constants/firebase/addDocData';
+import { deleteDocData } from '../../constants/firebase/deleteDocData';
 import { getDocsData } from '../../constants/firebase/getDocsData';
 import { groupArrayWithField } from '../../constants/groupArrayWithField';
-import { PlanModel, PlanTaskModel } from '../../models';
+import { PlanModel, PlanTaskModel, ReportSavedModel } from '../../models';
 import {
   useChildStore,
   useFieldStore,
+  useReportSavedStore,
   useReportStore,
   useTargetStore,
   useUserStore,
@@ -29,7 +34,7 @@ import {
 import AddReportItemComponent from './AddReportItemComponent';
 
 const AddReportScreen = ({ navigation }: any) => {
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
   const { child } = useChildStore();
   const { user } = useUserStore();
   const { targets } = useTargetStore();
@@ -40,32 +45,51 @@ const AddReportScreen = ({ navigation }: any) => {
   const [addReports, setAddReports] = useState<any[]>([]);
   const { addReport } = useReportStore();
   const [isLoading, setIsLoading] = useState(false);
+  const { reportSaveds } = useReportSavedStore();
+  const [isReportSaved, setIsReportSaved] = useState(false);
 
   useEffect(() => {
     if (planSelected) {
-      //   const index = planApprovals.findIndex(_ => _.id === planId);
-      //   setPlan(planApprovals[index]);
-      getDocsData({
-        nameCollect: 'planTasks',
-        condition: [
-          where('teacherIds', 'array-contains', user?.id),
-          where('planId', '==', planSelected.id),
-        ],
-        setData: setPlanTasks,
-      });
+      const items = reportSaveds.filter(
+        (reportSaved: ReportSavedModel) =>
+          reportSaved.planId === planSelected.id,
+      );
+
+      if (items.length > 0) {
+        setIsReportSaved(true);
+        setPlanTasks(items);
+      } else {
+        setIsReportSaved(false);
+        getDocsData({
+          nameCollect: 'planTasks',
+          condition: [
+            where('teacherIds', 'array-contains', user?.id),
+            where('planId', '==', planSelected.id),
+          ],
+          setData: setPlanTasks,
+        });
+      }
     }
   }, [planSelected]);
   useEffect(() => {
     if (planTasks) {
-      setAddReports(planTasks);
+      if (isReportSaved) {
+        setAddReports(
+          planTasks.map((planTask: any) => {
+            const { id, ..._ } = planTask;
+            return {
+              ..._,
+              reportSavedId: id,
+              id: _.planTaskId,
+            };
+          }),
+        );
+      } else {
+        setAddReports(planTasks);
+      }
     }
   }, [planTasks]);
 
-  const handleChangeValue = (data: { val: string; planTaskId: string }) => {
-    const index = addReports.findIndex((_: any) => _.id === data.planTaskId);
-    addReports[index].total = data.val;
-    setAddReports(addReports);
-  };
   const handleAddReport = async () => {
     if (user && child) {
       setIsLoading(true);
@@ -122,6 +146,18 @@ const AddReportScreen = ({ navigation }: any) => {
           );
 
           await Promise.all(promiseItems);
+
+          if (isReportSaved) {
+            const promiseReportSavedtems = addReports.map(reportSaved =>
+              deleteDocData({
+                nameCollect: 'reportSaveds',
+                id: reportSaved.reportSavedId,
+                metaDoc: 'reportSaveds',
+              }),
+            );
+            await Promise.all(promiseReportSavedtems);
+          }
+
           setIsLoading(false);
         })
         .catch(error => {
@@ -142,10 +178,49 @@ const AddReportScreen = ({ navigation }: any) => {
       'fieldId',
     );
   };
+  const handleSaveReportSaved = async () => {
+    if (isReportSaved) {
+      // xoa het them lai
+      const promiseReportSavedtems = addReports.map(reportSaved =>
+        deleteDocData({
+          nameCollect: 'reportSaveds',
+          id: reportSaved.reportSavedId,
+          metaDoc: 'reportSaveds',
+        }),
+      );
+      await Promise.all(promiseReportSavedtems);
+    }
+
+    // them moi tat ca
+    const promiseItems = addReports.map(_ => {
+      const { id, ...data } = _;
+      addDocData({
+        nameCollect: 'reportSaveds',
+        value: {
+          ...data,
+          planTaskId: id,
+          total: _.total ?? '',
+        },
+        metaDoc: 'reportSaveds',
+      });
+    });
+
+    Promise.all(promiseItems)
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch(error => {
+        setIsLoading(false);
+        console.log(error);
+      });
+  };
 
   if (!child) return <ActivityIndicator />;
   return (
-    <SafeAreaView style={{ flex: 1 , backgroundColor: colors.background}} edges={['bottom']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={['bottom']}
+    >
       <Container
         back
         bg={colors.primaryLight}
@@ -174,7 +249,7 @@ const AddReportScreen = ({ navigation }: any) => {
 
           {planSelected && (
             <KeyboardAwareFlatList
-              keyboardShouldPersistTaps='handled'
+              keyboardShouldPersistTaps="handled"
               enableOnAndroid={true}
               extraScrollHeight={100}
               showsVerticalScrollIndicator={false}
@@ -185,9 +260,7 @@ const AddReportScreen = ({ navigation }: any) => {
                   key={item.id}
                   index={index}
                   addReport={item}
-                  onChange={(data: { val: string; planTaskId: string }) =>
-                    handleChangeValue(data)
-                  }
+                  addReports={addReports}
                 />
               )}
               ListFooterComponent={
@@ -195,6 +268,13 @@ const AddReportScreen = ({ navigation }: any) => {
                   justify="space-around"
                   styles={{ paddingVertical: 16 }}
                 >
+                  <ButtonComponent
+                    color={colors.orange}
+                    text="Lưu nháp"
+                    onPress={handleSaveReportSaved}
+                    styles={{ flex: 1 }}
+                  />
+                  <SpaceComponent width={20} />
                   <ButtonComponent
                     color={colors.green}
                     text="Gửi duyệt"

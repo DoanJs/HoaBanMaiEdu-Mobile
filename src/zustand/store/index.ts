@@ -5,6 +5,7 @@ import useChildStore from './useChildStore';
 import useFieldStore from './useFieldStore';
 import useInterventionStore from './useInterventionStore';
 import usePlanStore from './usePlanStore';
+import useReportSavedStore from './useReportSavedStore';
 import useReportStore from './useReportStore';
 import useSuggestStore from './useSuggestStore';
 import useTargetStore from './useTargetStore';
@@ -21,5 +22,6 @@ export {
   useInterventionStore,
   useCartEditStore,
   usePlanStore,
-  useReportStore
+  useReportStore,
+  useReportSavedStore
 };

@@ -333,7 +333,6 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
                 reportTasks={reportTasks}
                 onSetReportTasks={setReportTasks}
                 setDisable={setDisable}
-                onChange={() => { }}
               />
             )}
             ListFooterComponent={

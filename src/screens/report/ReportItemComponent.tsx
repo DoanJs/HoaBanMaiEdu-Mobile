@@ -15,7 +15,6 @@ interface Props {
   reportTasks: ReportTaskModel[];
   onSetReportTasks: any;
   setDisable: any;
-  onChange: (data: { val: string; planTaskId: string }) => void;
 }
 
 const ReportItemComponent = (props: Props) => {
@@ -26,7 +25,6 @@ const ReportItemComponent = (props: Props) => {
     reportTasks,
     onSetReportTasks,
     setDisable,
-    onChange,
   } = props;
   const [content, setContent] = useState('');
   const { targets } = useTargetStore();
@@ -120,13 +118,7 @@ const ReportItemComponent = (props: Props) => {
           }}
           placeholder="Tổng kết..."
           value={content}
-          onChange={val => {
-            setContent(val);
-            onChange({
-              val,
-              planTaskId: planTask.id,
-            });
-          }}
+          onChange={val => setContent(val)}
           multible
           numberOfLine={4}
         />

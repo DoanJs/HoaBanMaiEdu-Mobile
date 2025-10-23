@@ -1,22 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { InputComponent, RowComponent, TextComponent } from '../../components';
+import { colors } from '../../constants/colors';
 import { convertTargetField } from '../../constants/convertTargetAndField';
 import { fontFamillies } from '../../constants/fontFamilies';
 import { useFieldStore, useTargetStore } from '../../zustand/store';
-import { colors } from '../../constants/colors';
 
 interface Props {
   index: number;
   addReport: any;
-  onChange: (data: { val: string; planTaskId: string }) => void;
+  addReports: any[];
 }
 
 const AddReportItemComponent = (props: Props) => {
-  const { index, addReport, onChange } = props;
+  const { index, addReport, addReports } = props;
   const [text, setText] = useState('');
+  const [textSource, setTextSource] = useState('');
   const { targets } = useTargetStore();
   const { fields } = useFieldStore();
+
+  useEffect(() => {
+    if (addReport && addReport.total) {
+      setText(addReport.total);
+      setTextSource(addReport.total);
+    } else {
+      setText('');
+      setTextSource('');
+    }
+  }, [addReport]);
+  useEffect(() => {
+    if (text) {
+      const index = addReports.findIndex((_: any) => _.id === addReport.id);
+      addReports[index].total = text;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text]);
 
   return (
     <View
@@ -71,13 +89,7 @@ const AddReportItemComponent = (props: Props) => {
         }}
         placeholder="Tổng kết..."
         value={text}
-        onChange={val => {
-          setText(val);
-          onChange({
-            val,
-            planTaskId: addReport.id,
-          });
-        }}
+        onChange={val => setText(val)}
         multible
         numberOfLine={4}
       />
