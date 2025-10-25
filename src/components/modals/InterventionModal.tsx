@@ -35,6 +35,7 @@ export default function InterventionModal(props: Props) {
       onPress={() => {
         setSelected(item.name);
         onChange(item.name);
+        onClose()
       }}
     >
       <Text

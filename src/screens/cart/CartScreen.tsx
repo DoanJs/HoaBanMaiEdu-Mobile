@@ -10,11 +10,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   RefreshControl,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { db } from '../../../firebase.config';
 import {
   ButtonComponent,
@@ -47,7 +50,7 @@ import {
 } from '../../zustand/store';
 
 const CartScreen = ({ navigation }: any) => {
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
   const { user } = useUserStore();
   const { carts, setCarts } = useCartStore();
   const { child } = useChildStore();
@@ -251,7 +254,10 @@ const CartScreen = ({ navigation }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['bottom']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={['bottom']}
+    >
       <Container
         bg={colors.primaryLight}
         title={child.fullName}
@@ -293,7 +299,7 @@ const CartScreen = ({ navigation }: any) => {
 
               <GestureHandlerRootView>
                 <KeyboardAwareFlatList
-                  keyboardShouldPersistTaps='handled'
+                  keyboardShouldPersistTaps="handled"
                   enableOnAndroid={true}
                   extraScrollHeight={100}
                   showsVerticalScrollIndicator={false}
@@ -306,7 +312,11 @@ const CartScreen = ({ navigation }: any) => {
                     />
                   }
                   renderItem={({ item, index }) => (
-                    <CartItemComponent key={item.id} index={index} cart={item} />
+                    <CartItemComponent
+                      key={item.id}
+                      index={index}
+                      cart={item}
+                    />
                   )}
                   ListFooterComponent={
                     carts.length > 0 ? (
@@ -341,7 +351,9 @@ const CartScreen = ({ navigation }: any) => {
                             <ButtonComponent
                               color={cartEdit ? colors.blue : colors.green}
                               textStyles={{
-                                color: cartEdit ? colors.background : colors.text,
+                                color: cartEdit
+                                  ? colors.background
+                                  : colors.text,
                               }}
                               text={cartEdit ? 'Lưu' : 'Gửi duyệt'}
                               onPress={handleAddEditPlan}
@@ -358,22 +370,18 @@ const CartScreen = ({ navigation }: any) => {
               </GestureHandlerRootView>
             </>
           ) : (
-            <RowComponent justify="center">
+            <RowComponent justify="center" styles={{ alignItems: 'center' }}>
               <TextComponent
                 text="Giỏ mục tiêu trống !"
                 font={fontFamillies.poppinsBold}
               />
               <SpaceComponent width={10} />
-              <TouchableOpacity
+              <AddCircle
+                size={sizes.extraTitle}
+                color={colors.green}
+                variant="Bold"
                 onPress={() => navigation.navigate('Target')}
-                style={{
-                  backgroundColor: colors.green,
-                  padding: 10,
-                  borderRadius: 10,
-                }}
-              >
-                <TextComponent text="Tạo kế hoạch mới" />
-              </TouchableOpacity>
+              />
             </RowComponent>
           )}
         </SectionComponent>

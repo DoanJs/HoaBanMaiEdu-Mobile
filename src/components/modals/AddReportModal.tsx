@@ -36,6 +36,7 @@ export default function AddReportModal(props: Props) {
       onPress={() => {
         setSelected(item.title);
         onChange(item);
+        onClose()
       }}
     >
       <Text

@@ -45,6 +45,7 @@ export default function SuggestModal(props: Props) {
       onPress={() => {
         setSelected(item.name);
         onChange(item.name);
+        onClose()
       }}
     >
       <Text

@@ -9,12 +9,16 @@ import {
   DocumentDownload,
   MessageAdd,
   MessageNotif,
-  Profile2User,
   Trash,
 } from 'iconsax-react-native';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Linking } from 'react-native';
+import { ActivityIndicator, Alert, Linking } from 'react-native';
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import Share from 'react-native-share';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -46,12 +50,10 @@ import {
   useUserStore,
 } from '../../zustand/store';
 import ReportItemComponent from './ReportItemComponent';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 
 const ReportDetailScreen = ({ navigation, route }: any) => {
   const { report } = route.params;
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
   const { child } = useChildStore();
   const { user } = useUserStore();
   const [disable, setDisable] = useState(true);
@@ -103,6 +105,12 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
     if (!disable) {
       try {
         setIsLoading(true);
+        const updateReport = await updateDocData({
+          nameCollect: 'reports',
+          id: report.id,
+          metaDoc: 'reports',
+          valueUpdate: { ...report, updateAt: serverTimestamp() },
+        });
         const promiseItems = reportTasks.map(_ =>
           updateDocData({
             nameCollect: 'reportTasks',
@@ -114,7 +122,7 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
             metaDoc: 'reports',
           }),
         );
-        await Promise.all(promiseItems);
+        await Promise.all([...promiseItems, updateReport]);
         setIsLoading(false);
         setDisable(true);
       } catch (error) {
@@ -255,12 +263,11 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
 
   if (!child) return <ActivityIndicator />;
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['bottom']}>
-      <Container
-        back
-        bg={colors.primaryLight}
-        title={child.fullName}
-      >
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={['bottom']}
+    >
+      <Container back bg={colors.primaryLight} title={child.fullName}>
         <SectionComponent
           styles={{
             backgroundColor: colors.background,
@@ -269,7 +276,10 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
           }}
         >
           <RowComponent justify="space-between">
-            <TextComponent text={report.title} font={fontFamillies.poppinsBold} />
+            <TextComponent
+              text={report.title}
+              font={fontFamillies.poppinsBold}
+            />
             {isComment && report.status === 'pending' && (
               <MessageNotif
                 size={sizes.title}
@@ -280,7 +290,9 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
             )}
             {!isComment &&
               report.status === 'pending' &&
-              ['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
+              ['Phó Giám đốc', 'Giám đốc'].includes(
+                user?.position as string,
+              ) && (
                 <MessageAdd
                   size={sizes.title}
                   color={colors.green}
@@ -305,20 +317,20 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
             />
             {convertTimeStampFirestore(report?.createAt) !==
               convertTimeStampFirestore(report?.updateAt) && (
-                <TextComponent
-                  styles={{ fontStyle: 'italic' }}
-                  text={`Cập nhật: ${moment(
-                    convertTimeStampFirestore(report?.updateAt),
-                  ).format('HH:mm:ss DD/MM/YYYY')}`}
-                  size={sizes.extraComment}
-                />
-              )}
+              <TextComponent
+                styles={{ fontStyle: 'italic' }}
+                text={`Cập nhật: ${moment(
+                  convertTimeStampFirestore(report?.updateAt),
+                ).format('HH:mm:ss DD/MM/YYYY')}`}
+                size={sizes.extraComment}
+              />
+            )}
           </RowComponent>
 
-          <SpaceComponent height={8}/>
+          <SpaceComponent height={8} />
 
           <KeyboardAwareFlatList
-            keyboardShouldPersistTaps='handled'
+            keyboardShouldPersistTaps="handled"
             enableOnAndroid={true}
             extraScrollHeight={100}
             showsVerticalScrollIndicator={false}
@@ -370,7 +382,7 @@ const ReportDetailScreen = ({ navigation, route }: any) => {
                       name="save"
                       size={sizes.extraTitle}
                       color={disable ? colors.gray2 : colors.blue}
-                      onPress={disable ? () => { } : handleSaveReportTask}
+                      onPress={disable ? () => {} : handleSaveReportTask}
                     />
                     <Trash
                       variant="Bold"
