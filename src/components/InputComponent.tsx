@@ -13,12 +13,11 @@ import Feather from 'react-native-vector-icons/Feather';
 import { colors } from '../constants/colors';
 import { globalStyles } from '../styles/globalStyles';
 import RowComponent from './RowComponent';
-import { SpaceComponent } from '.';
 
 interface Props {
   value: string;
   onChange: (val: string) => void;
-  keyboardType?: KeyboardTypeOptions
+  keyboardType?: KeyboardTypeOptions;
   placeholder?: string;
   placeholderTextColor?: string;
   prefix?: ReactNode;
@@ -30,7 +29,7 @@ interface Props {
   styles?: StyleProp<ViewStyle>;
   textStyles?: StyleProp<TextStyle>;
   color?: string;
-  editable?: boolean
+  editable?: boolean;
 }
 
 const InputComponent = (props: Props) => {
@@ -49,7 +48,7 @@ const InputComponent = (props: Props) => {
     isPassword,
     styles,
     textStyles,
-    editable
+    editable,
   } = props;
   const [showPass, setShowPass] = useState(false);
 
@@ -74,11 +73,7 @@ const InputComponent = (props: Props) => {
           }}
         >
           <TextInput
-            style={[
-              globalStyles.text,
-              { margin: 0, padding: 10},
-              textStyles,
-            ]}
+            style={[globalStyles.text, { margin: 0, padding: 10 }, textStyles]}
             placeholder={placeholder ?? ''}
             placeholderTextColor={placeholderTextColor ?? '#676767'}
             value={value}
@@ -93,7 +88,10 @@ const InputComponent = (props: Props) => {
         </View>
         {affix && affix}
         {allowClear && value && (
-          <TouchableOpacity style={{paddingRight: 8}} onPress={() => onChange('')}>
+          <TouchableOpacity
+            style={{ paddingRight: 8 }}
+            onPress={() => onChange('')}
+          >
             <AntDesign name="close" size={20} color={colors.text} />
           </TouchableOpacity>
         )}

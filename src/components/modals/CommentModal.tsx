@@ -1,10 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
-import { InputComponent } from '..';
+import { InputComponent, KeyboardAwareScrollViewComponent } from '..';
 import { colors } from '../../constants/colors';
 import { useUserStore } from '../../zustand/store';
 import { fontFamillies } from '../../constants/fontFamilies';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 interface Props {
   visible: boolean;
@@ -37,68 +38,73 @@ export default function CommentModal(props: Props) {
       style={styles.modal}
     >
       <View style={styles.modalBox}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>
-            Góp ý từ cô {comment.split('@Js@')[0]}:{' '}
-          </Text>
-          <TouchableOpacity onPress={onClose}>
-            <Text style={styles.closeBtn}>Đóng</Text>
-          </TouchableOpacity>
-        </View>
-
-        <InputComponent
-          styles={{
-            backgroundColor: colors.background,
-            paddingVertical: 12,
-            borderRadius: 5,
-          }}
-          editable={['Phó Giám đốc', 'Giám đốc'].includes(
-            user?.position as string,
-          )}
-          placeholder="Viết nhận xét"
-          placeholderTextColor={colors.gray2}
-          color={colors.background}
-          value={value}
-          multible
-          numberOfLine={10}
-          textStyles={{
-            color: colors.text,
-            textAlignVertical: 'top',
-            minHeight: '40%',
-            fontFamily: fontFamillies.poppinsRegular
-          }}
-          onChange={val => onChange(val)}
-        />
-
-        {['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
-          <View style={styles.actionRow}>
-            <TouchableOpacity
-              onPress={onClose}
-              style={[styles.button, styles.cancel]}
-            >
-              <Text style={styles.buttonText}>Hủy</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={
-                disable
-                  ? () => { }
-                  : () => {
-                    handleSaveComment();
-                    onClose();
-                  }
-              }
-              style={[
-                styles.button,
-                {
-                  backgroundColor: disable ? colors.gray : colors.blue2,
-                },
-              ]}
-            >
-              <Text style={styles.buttonText}>Gửi</Text>
+        <KeyboardAwareScrollView
+          enableOnAndroid
+          extraScrollHeight={60}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          <View style={styles.header}>
+            <Text style={styles.headerText}>
+              Góp ý từ cô {comment.split('@Js@')[0]}:{' '}
+            </Text>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={styles.closeBtn}>Đóng</Text>
             </TouchableOpacity>
           </View>
-        )}
+          <InputComponent
+            styles={{
+              backgroundColor: colors.background,
+              paddingVertical: 12,
+              borderRadius: 5,
+            }}
+            editable={['Phó Giám đốc', 'Giám đốc'].includes(
+              user?.position as string,
+            )}
+            placeholder="Viết nhận xét"
+            placeholderTextColor={colors.gray2}
+            color={colors.background}
+            value={value}
+            multible
+            numberOfLine={10}
+            textStyles={{
+              color: colors.text,
+              textAlignVertical: 'top',
+              minHeight: '40%',
+              fontFamily: fontFamillies.poppinsRegular,
+            }}
+            onChange={val => onChange(val)}
+          />
+
+          {['Phó Giám đốc', 'Giám đốc'].includes(user?.position as string) && (
+            <View style={styles.actionRow}>
+              <TouchableOpacity
+                onPress={onClose}
+                style={[styles.button, styles.cancel]}
+              >
+                <Text style={styles.buttonText}>Hủy</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={
+                  disable
+                    ? () => {}
+                    : () => {
+                        handleSaveComment();
+                        onClose();
+                      }
+                }
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: disable ? colors.gray : colors.blue2,
+                  },
+                ]}
+              >
+                <Text style={styles.buttonText}>Gửi</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </KeyboardAwareScrollView>
       </View>
     </Modal>
   );
@@ -114,7 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 20,
-    maxHeight: '85%', // tránh tràn màn hình
+    maxHeight: '85%', // tránh tràn màn hình,
   },
   header: {
     flexDirection: 'row',

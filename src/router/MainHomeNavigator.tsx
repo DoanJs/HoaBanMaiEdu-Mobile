@@ -2,7 +2,7 @@ import { QueryConstraint, where } from '@react-native-firebase/firestore';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect } from 'react';
 import { useFirestoreWithMetaCondition } from '../constants/firebase/useFirestoreWithMetaCondition';
-import { CartModel, PlanModel, ReportModel } from '../models';
+import { CartModel, PlanModel, ReportModel, ReportSavedModel } from '../models';
 import {
   AddReportScreen,
   PlanDetailScreen,
@@ -12,6 +12,7 @@ import {
   useCartStore,
   useChildStore,
   usePlanStore,
+  useReportSavedStore,
   useReportStore,
   useUserStore,
 } from '../zustand/store';
@@ -24,6 +25,7 @@ const MainHomeNavigator = () => {
   const { setCarts } = useCartStore();
   const { setPlans } = usePlanStore();
   const { setReports } = useReportStore();
+  const { setReportSaveds } = useReportSavedStore();
 
   const { data: data_carts, loading: loading_carts } =
     useFirestoreWithMetaCondition({
@@ -31,6 +33,16 @@ const MainHomeNavigator = () => {
       metaDoc: 'carts',
       id: user?.id,
       nameCollect: 'carts',
+      condition: [
+        where('teacherIds', 'array-contains', user?.id),
+      ] as QueryConstraint[],
+    });
+  const { data: data_reportSaveds, loading: loading_reportSaveds } =
+    useFirestoreWithMetaCondition({
+      key: 'reportSavedsCache',
+      metaDoc: 'reportSaveds',
+      id: user?.id,
+      nameCollect: 'reportSaveds',
       condition: [
         where('teacherIds', 'array-contains', user?.id),
       ] as QueryConstraint[],
@@ -76,6 +88,15 @@ const MainHomeNavigator = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data_carts, loading_carts]);
+  useEffect(() => {
+    if (!loading_reportSaveds) {
+      const items = data_reportSaveds as ReportSavedModel[];
+      setReportSaveds(
+        items.filter(reportSaved => reportSaved.childId === child?.id),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data_reportSaveds, loading_reportSaveds]);
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

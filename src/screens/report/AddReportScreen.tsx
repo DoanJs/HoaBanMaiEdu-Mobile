@@ -19,12 +19,14 @@ import { AddReportModal } from '../../components/modals';
 import { colors } from '../../constants/colors';
 import { convertTargetField } from '../../constants/convertTargetAndField';
 import { addDocData } from '../../constants/firebase/addDocData';
+import { deleteDocData } from '../../constants/firebase/deleteDocData';
 import { getDocsData } from '../../constants/firebase/getDocsData';
 import { groupArrayWithField } from '../../constants/groupArrayWithField';
-import { PlanModel, PlanTaskModel } from '../../models';
+import { PlanModel, PlanTaskModel, ReportSavedModel } from '../../models';
 import {
   useChildStore,
   useFieldStore,
+  useReportSavedStore,
   useReportStore,
   useTargetStore,
   useUserStore,
@@ -42,18 +44,42 @@ const AddReportScreen = ({ navigation }: any) => {
   const [planTasks, setPlanTasks] = useState<PlanTaskModel[]>([]);
   const [addReports, setAddReports] = useState<any[]>([]);
   const { addReport } = useReportStore();
+  const [disable, setDisable] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isReportSaved, setIsReportSaved] = useState(false);
+  const { reportSaveds, removeReportSaved, addReportSaved } =
+    useReportSavedStore();
 
   useEffect(() => {
     if (planSelected) {
-      getDocsData({
-        nameCollect: 'planTasks',
-        condition: [
-          where('teacherIds', 'array-contains', user?.id),
-          where('planId', '==', planSelected.id),
-        ],
-        setData: setPlanTasks,
-      });
+      setDisable(false);
+      const items = reportSaveds.filter(
+        (reportSaved: ReportSavedModel) =>
+          reportSaved.planId === planSelected.id,
+      );
+
+      if (items.length > 0) {
+        setIsReportSaved(true);
+        setPlanTasks(items);
+      } else {
+        setIsReportSaved(false);
+        getDocsData({
+          nameCollect: 'planTasks',
+          condition: [
+            where('teacherIds', 'array-contains', user?.id),
+            where('planId', '==', planSelected.id),
+          ],
+          setData: setPlanTasks,
+        });
+      }
+      // getDocsData({
+      //   nameCollect: 'planTasks',
+      //   condition: [
+      //     where('teacherIds', 'array-contains', user?.id),
+      //     where('planId', '==', planSelected.id),
+      //   ],
+      //   setData: setPlanTasks,
+      // });
     }
   }, [planSelected]);
   useEffect(() => {
@@ -105,7 +131,7 @@ const AddReportScreen = ({ navigation }: any) => {
                 reportId: result.id,
                 planId: planSelected?.id as string,
                 childId: child.id,
-                planTaskId: _.id,
+                planTaskId: isReportSaved ? _.planTaskId : _.id,
                 content: _.total ?? '',
                 isEdit: false,
                 teacherIds: child.teacherIds,
@@ -118,6 +144,20 @@ const AddReportScreen = ({ navigation }: any) => {
           );
 
           await Promise.all(promiseItems);
+
+          if (isReportSaved) {
+            const promiseReportSavedtems = addReports.map(reportSaved => {
+              deleteDocData({
+                nameCollect: 'reportSaveds',
+                id: reportSaved.id,
+                metaDoc: 'reportSaveds',
+              });
+              removeReportSaved(reportSaved.id);
+            });
+            await Promise.all(promiseReportSavedtems);
+          }
+
+          setIsReportSaved(false);
           setIsLoading(false);
         })
         .catch(error => {
@@ -138,6 +178,56 @@ const AddReportScreen = ({ navigation }: any) => {
       'fieldId',
     );
   };
+  const handleSaveReportSaved = async () => {
+    setIsLoading(true);
+    if (isReportSaved) {
+      // xoa het them lai
+      const promiseReportSavedtems = addReports.map(reportSaved =>
+        deleteDocData({
+          nameCollect: 'reportSaveds',
+          id: reportSaved.id,
+          metaDoc: 'reportSaveds',
+        }),
+      );
+      await Promise.all(promiseReportSavedtems);
+    }
+
+    // them moi tat ca
+    const promiseItems = addReports.map(_ => {
+      const { id, ...data } = _;
+      addDocData({
+        nameCollect: 'reportSaveds',
+        value: {
+          ...data,
+          planTaskId: _.planTaskId ?? id,
+          total: _.total ?? '',
+        },
+        metaDoc: 'reportSaveds',
+      }).then(result => {
+        removeReportSaved(_.id);
+        addReportSaved({
+          ...data,
+          planTaskId: _.planTaskId ?? id,
+          total: _.total ?? '',
+          id: result.id,
+        });
+      });
+    });
+
+    Promise.all(promiseItems)
+      .then(() => {
+        setIsLoading(false);
+        setPlanSelected(undefined);
+        setPlanTasks([]);
+        setDisable(true);
+        setIsReportSaved(true);
+      })
+      .catch(error => {
+        setIsLoading(false);
+        console.log(error);
+      });
+  };
+
   if (!child) return <ActivityIndicator />;
   return (
     <SafeAreaView
@@ -187,17 +277,30 @@ const AddReportScreen = ({ navigation }: any) => {
                 />
               )}
               ListFooterComponent={
-                <RowComponent
-                  justify="space-around"
-                  styles={{ paddingVertical: 16 }}
-                >
-                  <ButtonComponent
-                    color={colors.green}
-                    text="Gửi duyệt"
-                    onPress={handleAddReport}
-                    styles={{ flex: 1 }}
-                  />
-                </RowComponent>
+                !disable ? (
+                  <RowComponent
+                    justify="space-around"
+                    styles={{ paddingVertical: 16 }}
+                  >
+                    <ButtonComponent
+                      color={isReportSaved ? colors.orange : colors.primary}
+                      text={
+                        isReportSaved ? 'Cập nhập lưu nháp' : 'Tạo bản lưu nháp'
+                      }
+                      onPress={handleSaveReportSaved}
+                      styles={{ flex: 1 }}
+                    />
+                    <SpaceComponent width={10} />
+                    <ButtonComponent
+                      color={colors.green}
+                      text="Gửi duyệt"
+                      onPress={handleAddReport}
+                      styles={{ flex: 1 }}
+                    />
+                  </RowComponent>
+                ) : (
+                  <></>
+                )
               }
             />
           )}
